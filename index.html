@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG Oyunu</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: sans-serif; background: #0f172a; color: #fff; text-align: center; padding: 20px; margin: 0; }
+        .card { background: #1e293b; max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        button { background: #10b981; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; margin-top: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 16px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <!-- İLK DƏFƏ GİRƏNDƏ AD İSTƏYİR -->
+    <div id="name-screen">
+        <h3>🎮 Oyuna Xoş Gəldiniz</h3>
+        <p>İstifadəçi adınızı yazın:</p>
+        <input type="text" id="usernameInput" placeholder="Adınız...">
+        <button onclick="saveName()">Oyuna Başla</button>
+    </div>
+
+    <!-- OYUN SAHƏSİ -->
+    <div id="game-screen" class="hidden">
+        <h2>👤 <span id="displayName"></span></h2>
+        <hr style="border-color: #334155;">
+        <p>🪙 Qızıl: <span id="coin">0</span></p>
+        <p>👹 Boss Level: <span id="bossLvl">1</span></p>
+
+        <button onclick="attackBoss()">⚔️ Boss-a Hücum Et (+50 Qızıl)</button>
+        <button onclick="resetProgress()" style="background: #ef4444;">🔄 Sıfırla və Çıx</button>
+    </div>
+</div>
+
+<script>
+    let player = {
+        name: localStorage.getItem('player_name') || '',
+        coin: parseInt(localStorage.getItem('player_coin')) || 0,
+        bossLvl: parseInt(localStorage.getItem('player_lvl')) || 1
+    };
+
+    window.onload = function() {
+        if (player.name) {
+            showGameScreen();
+        }
+    };
+
+    function saveName() {
+        let name = document.getElementById('usernameInput').value.trim();
+        if (!name) return alert("Zəhmət olmasa ad yazın!");
+        
+        player.name = name;
+        localStorage.setItem('player_name', name);
+        saveData();
+        showGameScreen();
+    }
+
+    function attackBoss() {
+        player.coin += 50;
+        player.bossLvl += 1;
+        saveData();
+        updateUI();
+        alert("Boss məğlub oldu! Yeni seviyyə: " + player.bossLvl);
+    }
+
+    function saveData() {
+        localStorage.setItem('player_coin', player.coin);
+        localStorage.setItem('player_lvl', player.bossLvl);
+    }
+
+    function updateUI() {
+        document.getElementById('displayName').innerText = player.name;
+        document.getElementById('coin').innerText = player.coin;
+        document.getElementById('bossLvl').innerText = player.bossLvl;
+    }
+
+    function showGameScreen() {
+        document.getElementById('name-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        updateUI();
+    }
+
+    function resetProgress() {
+        if (confirm(" Bütün yaddaş silinsin?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+</script>
+
+</body>
+</html>
