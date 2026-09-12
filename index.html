@@ -4,295 +4,874 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Təhsil RPG Oyunu</title>
-    <!-- Konfetti Kitabxanası -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
     <style>
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background: #0b0e14;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%);
             color: #e2e8f0;
             text-align: center;
-            padding: 15px;
+            padding: 20px 12px;
             margin: 0;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            position: relative;
         }
         .container {
             width: 100%;
-            max-width: 420px;
-            background: #121826;
-            padding: 20px;
+            max-width: 440px;
+            background: rgba(18, 24, 38, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 24px;
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            position: relative;
         }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .player-badge { background: #1e293b; padding: 6px 12px; border-radius: 20px; font-size: 13px; color: #38bdf8; border: 1px solid #334155; }
-        h2 { color: #f59e0b; margin: 5px 0 15px 0; font-size: 24px; }
-        .stats { background: #1e293b; padding: 12px; border-radius: 12px; margin-bottom: 15px; display: flex; justify-content: space-around; border: 1px solid #334155; font-size: 14px; font-weight: bold; }
-        .box { background: #1a2234; padding: 15px; margin-top: 12px; border-radius: 12px; border: 1px solid #334155; text-align: left; }
-        .box h3 { margin-top: 0; color: #38bdf8; font-size: 15px; text-align: center; }
-        input, button { width: 100%; padding: 10px; margin: 5px 0; border-radius: 10px; border: none; outline: none; font-size: 14px; }
-        input { background: #0f172a; color: #fff; border: 1px solid #334155; }
-        button { background: #059669; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        button:active { transform: scale(0.97); }
-        
-        /* Market Düymələri */
-        .market-row { display: flex; gap: 8px; margin-top: 5px; }
-        .btn-market { background: #d97706; font-size: 13px; padding: 8px; }
 
-        /* GUI Mesaj Paneli */
-        .game-log {
-            background: #0f172a;
-            color: #38bdf8;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 13px;
-            min-height: 45px;
-            margin-top: 12px;
-            border: 1px dashed #334155;
+        /* --- YUXARI PANEL (SOLDA NICK, SAĞDA LİDERLƏR) --- */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .player-badge {
             display: flex;
             align-items: center;
-            justify-content: center;
-            text-align: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #38bdf8;
+        }
+        .leaderboard-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+            width: auto;
+            margin: 0;
+        }
+        .leaderboard-btn:hover {
+            transform: translateY(-1px);
+            opacity: 0.95;
         }
 
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 999;
+        h2 {
+            color: #f59e0b;
+            margin-top: 0;
+            margin-bottom: 18px;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+            word-wrap: break-word;
         }
-        .alert-card { background: #1e293b; padding: 22px; border-radius: 18px; width: 90%; max-width: 350px; border: 1px solid #334155; }
-        .hidden { display: none !important; }
-        .btn-danger { background: #dc2626 !important; }
-        .choice-btn { background: #334155; margin: 4px 0; text-align: left; padding: 10px 12px; font-size: 13px; }
-        .choice-btn:hover { background: #475569; }
+        .stats {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 14px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .stats span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        input, button {
+            width: 100%;
+            padding: 13px 16px;
+            margin: 6px 0;
+            border-radius: 12px;
+            border: none;
+            font-size: 14px;
+            outline: none;
+            font-weight: 500;
+        }
+        input {
+            background: rgba(30, 41, 59, 0.7);
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        input::placeholder {
+            color: #64748b;
+        }
+        input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            background: rgba(30, 41, 59, 0.9);
+        }
+        button {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            white-space: normal;
+        }
+        button:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        button:disabled {
+            background: #334155;
+            color: #94a3b8;
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none;
+        }
+        .shop-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+        .boss-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .reset-btn {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            margin-top: 15px;
+            box-shadow: none;
+        }
+        .reset-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+        .box {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            margin-top: 16px;
+            border-radius: 14px;
+        }
+        .box p, .box h3 {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+        .box h3 {
+            font-size: 16px;
+            letter-spacing: -0.3px;
+        }
+        .msg {
+            font-weight: 600;
+            margin-top: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            max-width: 100%;
+        }
+        .boss-stats {
+            background: linear-gradient(135deg, rgba(127, 29, 29, 0.4), rgba(69, 10, 10, 0.4));
+            padding: 12px;
+            border-radius: 10px;
+            margin: 12px 0;
+            font-size: 14px;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            word-wrap: break-word;
+            line-height: 1.6;
+        }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            20% { transform: translate(-3px, 0px) rotate(-1deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            80% { transform: translate(1px, 1px) rotate(-1deg); }
+            100% { transform: translate(0px, 0px) rotate(0deg); }
+        }
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+            border-color: rgba(239, 68, 68, 0.6) !important;
+        }
+
+        /* --- GUI PƏNCƏRƏLƏRİ --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 8888;
+        }
+        .alert-card {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 22px;
+            width: 90%;
+            max-width: 360px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            text-align: center;
+        }
+        .alert-card p {
+            margin: 0 0 16px 0;
+            font-size: 15px;
+            color: #f1f5f9;
+            line-height: 1.4;
+        }
+        .alert-card button {
+            background: #6366f1;
+            color: white;
+            padding: 11px;
+            border-radius: 10px;
+            margin: 4px 0;
+            font-size: 14px;
+        }
+        .btn-confirm-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+        }
+        .btn-confirm-cancel {
+            background: #475569 !important;
+        }
+
+        /* --- LİDERLƏR LÖVHƏSİ SİYAHISI (SCROLL) --- */
+        .leaderboard-list {
+            max-height: 260px;
+            overflow-y: auto;
+            margin: 15px 0;
+            padding-right: 5px;
+            text-align: left;
+        }
+        .leaderboard-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .leaderboard-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        .lb-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 10px 14px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .lb-item.active-player {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.4);
+            font-weight: 700;
+        }
+        .lb-rank {
+            font-weight: 800;
+            width: 35px;
+            color: #f59e0b;
+        }
+        .lb-name {
+            flex-grow: 1;
+            color: #f8fafc;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 10px;
+        }
+        .lb-score {
+            font-weight: 700;
+            color: #ef4444;
+            white-space: nowrap;
+        }
+
+        /* --- GAME OVER OVERLAY EKRANI --- */
+        #game-over-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(5, 5, 10, 0.94);
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+        .game-over-text {
+            color: #ef4444;
+            font-size: 48px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.6), 0 0 30px rgba(220, 38, 38, 0.4);
+            animation: pulseGameOver 1.5s infinite alternate;
+            margin: 0 0 10px 0;
+        }
+        .game-over-sub {
+            color: #94a3b8;
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
+        @keyframes pulseGameOver {
+            0% { transform: scale(1); text-shadow: 0 0 15px rgba(239, 68, 68, 0.6); }
+            100% { transform: scale(1.06); text-shadow: 0 0 30px rgba(239, 68, 68, 0.9), 0 0 50px rgba(220, 38, 38, 0.7); }
+        }
+        #replay-btn {
+            width: auto;
+            min-width: 200px;
+            padding: 16px 32px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            background: linear-gradient(135deg, #ef4444, #991b1b);
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+        #replay-btn:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+        }
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="mainContainer">
+    <!-- YUXARI PANEL -->
     <div class="top-bar">
-        <div class="player-badge">👤 <span id="playerNameDisplay">---</span></div>
-        <button style="width: auto; padding: 6px 12px; font-size: 12px; background: #334155;" onclick="melumatGoster()">📊 Status</button>
+        <div class="player-badge">
+            👤 <span id="playerNameDisplay">Oyuncu</span>
+        </div>
+        <button class="leaderboard-btn" onclick="liderleriGoster()">🏆 Liderlər</button>
     </div>
 
     <h2>🎯 Təhsil RPG</h2>
     
+    <!-- Statistikalar -->
     <div class="stats">
         <span>🪙 <span id="coinCount">0</span></span>
         <span>❤️ <span id="hpCount">100</span></span>
         <span>⚔️ <span id="dmgCount">10</span></span>
     </div>
 
-    <!-- MARKET BÖLMƏSİ (Qiymətlər hər alışda +5 artır) -->
-    <div class="box" style="padding: 10px 15px;">
-        <h3>🛒 Alqı-Satqı Marketi</h3>
-        <div class="market-row">
-            <button class="btn-market" onclick="canAl()">❤️ Can Al (+20)<br><span id="hpPriceText">10</span> Qızıl</button>
-            <button class="btn-market" onclick="hasarAl()" style="background: #2563eb;">⚔️ Hasar Al (+5)<br><span id="dmgPriceText">10</span> Qızıl</button>
+    <!-- Sual Əlavə Etmə Bölməsi -->
+    <div class="box">
+        <h3 style="margin-top: 0; color: #38bdf8;">📝 Sual Hazırla</h3>
+        <input type="text" id="sualInput" placeholder="Sualı yazın...">
+        <input type="text" id="cavabInput" placeholder="Düzgün cavabı yazın...">
+        <button onclick="sualElaveEt()">➕ Sualı Əlavə Et</button>
+        <p style="font-size: 13px; color: #94a3b8; margin: 8px 0 12px 0;">Əlavə olunan: <b id="sualSayi" style="color:#f8fafc;">0</b> / 15</p>
+        <button onclick="suallariSil()" style="background: #475569; box-shadow: none;">🗑️ Sualları Təmizlə</button>
+    </div>
+
+    <!-- Oyun Ərazisi -->
+    <div class="box">
+        <button id="startBtn" onclick="oyunBasla()" disabled>▶️ Oyuna Başla (Min 5 Sual)</button>
+        
+        <div id="quizArea" style="display:none; margin-top:15px;">
+            <p id="sualMetni" style="font-size: 16px; font-weight: 600; color: #fbbf24; margin-bottom: 12px;"></p>
+            <input type="text" id="istifadeciCavabi" placeholder="Cavabınız...">
+            <button onclick="cavabiYoxla()">Cavabla 🚀</button>
         </div>
+        <p id="oyunMesaj" class="msg"></p>
     </div>
 
-    <!-- SUAL BÖLMƏSİ -->
+    <!-- Mağaza və Boss -->
     <div class="box">
-        <h3>📖 Təhsil Sualı (+5 Qızıl)</h3>
-        <p id="questionText" style="font-size: 13px; margin-bottom: 8px;">Sual yüklənir...</p>
-        <div id="choicesArea"></div>
+        <h3 style="margin-top: 0; color: #fbbf24;">🏪 Mağaza & Boss</h3>
+        <button class="shop-btn" id="canBtn" onclick="canArtir()">❤️ Can (+20) - <span id="canQiymeti">10</span> Coin</button>
+        <button class="shop-btn" id="hasarBtn" onclick="hasarArtir()">⚔️ Hasar (+5) - <span id="hasarQiymeti">10</span> Coin</button>
+        
+        <!-- Boss Məlumat Şiti -->
+        <div class="boss-stats">
+            👹 <b>Boss Lvl <span id="bossLvl">1</span></b><br>
+            🔴 Can: <span id="bossHp">30</span> | 💥 Hasar: <span id="bossDmg">10</span>
+        </div>
+
+        <button class="boss-btn" id="bossFightBtn" onclick="bossSavasi()">⚔️ Boss ilə Savaş!</button>
+        <p id="bossMesaj" class="msg"></p>
     </div>
 
-    <!-- BOSS BÖLMƏSİ -->
-    <div class="box">
-        <h3>👹 Boss Lvl <span id="bossLvl">1</span></h3>
-        <p style="font-size: 12px; margin: 4px 0;">🔴 Boss Canı: <span id="bossHp">30</span> | 💥 Hasarı: <span id="bossDmg">10</span></p>
-        <button onclick="bossSavasi()" class="btn-danger">⚔️ Boss ilə Savaş!</button>
-    </div>
-
-    <!-- GUI Mətn Ekranı -->
-    <div class="game-log" id="gameLog">Oyuna xoş gəldin! Suallara cavab ver və ya marketdən güclən.</div>
-
-    <button onclick="sifirla()" style="background: #7f1d1d; margin-top: 12px; font-size: 12px; padding: 6px;">🔄 Hesabı Sıfırla</button>
+    <!-- Bütün Uğurları Sıfırla Düyməsi -->
+    <button class="reset-btn" onclick="sifirlamaSorqusu()">🔄 Bütün Uğurları Sıfırla</button>
 </div>
 
-<!-- AD DAXİL ET MƏRHƏLƏSİ -->
-<div id="welcome-modal" class="modal-overlay">
+<!-- OYUNCU ADI DAXİL ETME (İLK GİRİŞ EKRANI) -->
+<div id="welcome-modal" class="modal-overlay hidden">
     <div class="alert-card">
-        <h3>🎮 Oyuna Başla</h3>
-        <p style="font-size: 14px; color: #94a3b8;">Qəhrəman adını daxil et:</p>
-        <input type="text" id="playerNameInput" placeholder="Adını yaz...">
-        <button onclick="oyuncuGiris()">Təsdiqlə</button>
+        <h3 style="color: #f59e0b; margin-top: 0; margin-bottom: 10px;">🎮 Xoş Gəldiniz!</h3>
+        <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 15px;">Oyuna başlamaq üçün adınızı daxil edin:</p>
+        <input type="text" id="playerNameInput" placeholder="Nick Name yazın..." style="margin-bottom: 12px;">
+        <button onclick="oyuncuAdiniYaddaSaxla()" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">Təsdiqlə və Başla 🚀</button>
     </div>
+</div>
+
+<!-- LİDERLƏR LÖVHƏSİ MODAL EKRANI -->
+<div id="leaderboard-modal" class="modal-overlay hidden">
+    <div class="alert-card">
+        <h3 style="color: #f59e0b; margin-top: 0; margin-bottom: 5px;">🏆 Liderlər Lövhəsi</h3>
+        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">Ən yüksək Boss Səviyyəsinə çatanlar</p>
+        
+        <div class="leaderboard-list" id="lbListArea">
+            <!-- Siyahı JS tərəfindən yüklənəcək -->
+        </div>
+
+        <button onclick="liderleriBagla()" style="background: #475569;">Bağla ✖️</button>
+    </div>
+</div>
+
+<!-- ADİ GUI XƏBƏRDARLIQ PƏNCƏRƏSİ -->
+<div id="custom-alert" class="modal-overlay hidden">
+    <div class="alert-card">
+        <p id="alert-text">Xəbərdarlıq mətni</p>
+        <button onclick="alertBagla()">Aha, anladım 👍</button>
+    </div>
+</div>
+
+<!-- SIFIRLAMA TƏSDİQİ ÜÇÜN XÜSUSİ GUI PƏNCƏRƏSİ -->
+<div id="custom-confirm" class="modal-overlay hidden">
+    <div class="alert-card">
+        <p style="color: #f87171; font-weight: 700; font-size: 17px; margin-bottom: 8px;">⚠️ Əminsiniz?</p>
+        <p style="font-size: 14px; color: #cbd5e1;">Bütün qazandığınız Coin-lər, güclər və əlavə etdiyiniz suallar tamamilə silinəcək!</p>
+        <button class="btn-confirm-danger" onclick="tesdiqSifirla()">Bəli, Hər Şeyi Sıfırla 🗑️</button>
+        <button class="btn-confirm-cancel" onclick="confirmBagla()">Xeyr, Saxla 🛡️</button>
+    </div>
+</div>
+
+<!-- GAME OVER OVERLAY EKRANI -->
+<div id="game-over-screen" class="hidden">
+    <h1 class="game-over-text">☠️ GAME OVER</h1>
+    <p class="game-over-sub">Məğlub oldunuz! Bütün xalların və uğurların sıfırlandı.</p>
+    <button id="replay-btn" onclick="restartGame()">🔄 Yenidən Başla</button>
 </div>
 
 <script>
-    // Suallar bazası (5 sual)
-    const questions = [
-        { q: "Azərbaycanın paytaxtı hansıdır?", choices: ["Gəncə", "Bakı", "Şəki", "Sumqayıt"], answer: 1 },
-        { q: "2 + 2 * 2 nəyə bərabərdir?", choices: ["6", "8", "4", "10"], answer: 0 },
-        { q: "Su hansı temperaturda qaynayır?", choices: ["90°C", "100°C", "80°C", "120°C"], answer: 1 },
-        { q: "Dünyanın ən böyük okeanı hansıdır?", choices: ["Atlantik", "Hind", "Şaxtalı Buzlu", "Sakit okean"], answer: 3 },
-        { q: "Kitabi-Dədə Qorqud dastanında əsas təpəgöz motivli boy hansıdır?", choices: ["Basatın Təpəgözü öldürdüyü boy", "Salong Oğlu Uruz", "Bamsı Beyrək"], answer: 0 }
-    ];
-
-    let currentQIndex = 0;
-    let playerName = localStorage.getItem('rpg_player_name') || "";
-    let bossLvl = parseInt(localStorage.getItem('rpg_boss_lvl')) || 1;
-    let coin = parseInt(localStorage.getItem('rpg_coin')) || 0;
-    let hp = parseInt(localStorage.getItem('rpg_hp')) || 100;
-    let dmg = parseInt(localStorage.getItem('rpg_dmg')) || 10;
+    let playerName = "";
+    let suallar = [];
+    let aktivSuallar = [];
+    let coin = 0;
+    let hp = 100;
+    let dmg = 10;
     
-    // Market qiymətləri
-    let hpPrice = parseInt(localStorage.getItem('rpg_hp_price')) || 10;
-    let dmgPrice = parseInt(localStorage.getItem('rpg_dmg_price')) || 10;
+    let canQiymeti = 10;
+    let hasarQiymeti = 10;
 
-    let bossHp = 30 + (bossLvl - 1) * 20;
-    let bossDmg = 10 + (bossLvl - 1) * 5;
+    let cariSualIndex = 0;
+    let oyunAktivdir = false;
+
+    let bossLvl = 1;
+    let bossHp = 30;
+    let bossDmg = 10;
+
+    let globalLeaders = [];
 
     window.onload = function() {
-        if (!playerName) {
+        yaddasdanYukle();
+        if (!playerName || playerName.trim() === "") {
             document.getElementById('welcome-modal').classList.remove('hidden');
         } else {
             document.getElementById('playerNameDisplay').innerText = playerName;
         }
-        uiYenile();
-        sualYukle();
+        statistikaniYenile();
     };
 
-    function logYaz(mesaj) {
-        document.getElementById('gameLog').innerText = mesaj;
-    }
-
-    function oyuncuGiris() {
-        let name = document.getElementById('playerNameInput').value.trim();
-        if (!name) return logYaz("Zəhmət olmasa ad yazın!");
-        playerName = name;
-        localStorage.setItem('rpg_player_name', playerName);
-        document.getElementById('playerNameDisplay').innerText = playerName;
-        document.getElementById('welcome-modal').classList.add('hidden');
-        yaddaSaxla();
-        logYaz("Xoş gəldin, " + playerName + "! Macəra başladı.");
-    }
-
-    function yaddaSaxla() {
-        localStorage.setItem('rpg_boss_lvl', bossLvl);
-        localStorage.setItem('rpg_coin', coin);
-        localStorage.setItem('rpg_hp', hp);
-        localStorage.setItem('rpg_dmg', dmg);
-        localStorage.setItem('rpg_hp_price', hpPrice);
-        localStorage.setItem('rpg_dmg_price', dmgPrice);
-    }
-
-    function sualYukle() {
-        let currentQ = questions[currentQIndex];
-        document.getElementById('questionText').innerText = currentQ.q;
-        let choicesArea = document.getElementById('choicesArea');
-        choicesArea.innerHTML = "";
-
-        currentQ.choices.forEach((choice, index) => {
-            let btn = document.createElement('button');
-            btn.className = "choice-btn";
-            btn.innerText = (index + 1) + ") " + choice;
-            btn.onclick = () => cavabYoxla(index, currentQ.answer);
-            choicesArea.appendChild(btn);
-        });
-    }
-
-    function cavabYoxla(secilen, dogru) {
-        if (secilen === dogru) {
-            coin += 5; // Hər doğru cavaba 5 coin
-            logYaz("✅ Doğru! +5 Qızıl qazandın.");
-            if(typeof confetti === 'function') confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } });
-        } else {
-            logYaz("❌ Səhv cavab! Növbəti suala keç.");
-        }
-        yaddaSaxla();
-        uiYenile();
-
-        currentQIndex = (currentQIndex + 1) % questions.length;
-        sualYukle();
-    }
-
-    // MARKET: Can almaq (qiymət hər dəfə +5 artır)
-    function canAl() {
-        if (coin >= hpPrice) {
-            coin -= hpPrice;
-            hp += 20;
-            hpPrice += 5; // Qiymət 5 vahid artır
-            logYaz("❤️ Can alındı! Canın +20 artdı.");
-            yaddaSaxla();
-            uiYenile();
-        } else {
-            logYaz("⚠️ Kifayət qədər qızılın yoxdur! (Lazım: " + hpPrice + ")");
-        }
-    }
-
-    // MARKET: Hasar almaq (qiymət hər dəfə +5 artır)
-    function hasarAl() {
-        if (coin >= dmgPrice) {
-            coin -= dmgPrice;
-            dmg += 5;
-            dmgPrice += 5; // Qiymət 5 vahid artır
-            logYaz("⚔️ Hasar alındı! Hasarın +5 artdı.");
-            yaddaSaxla();
-            uiYenile();
-        } else {
-            logYaz("⚠️ Kifayət qədər qızılın yoxdur! (Lazım: " + dmgPrice + ")");
-        }
-    }
-
-    // BOSS SAVAŞI (Güc çatmasa canın azalır!)
-    function bossSavasi() {
-        if (dmg >= bossHp) {
-            bossLvl++;
-            coin += 30;
-            bossHp = 30 + (bossLvl - 1) * 20;
-            bossDmg = 10 + (bossLvl - 1) * 5;
-
-            if (typeof confetti === 'function') {
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-            }
-
-            logYaz("🎉 Boss məğlub edildi! Level " + bossLvl + " açıldı, +30 Qızıl!");
-            yaddaSaxla();
-            uiYenile();
-        } else {
-            // Güc çatmadıqda boss səni vurur, canın azalır!
-            hp -= bossDmg;
-            logYaz("💥 Gücün çatmadı! Boss səni vurdu və " + bossDmg + " can apardı!");
+    function oyuncuAdiniYaddaSaxla() {
+        let inputVal = document.getElementById('playerNameInput').value.trim();
+        if (inputVal !== "") {
+            // EYNİ ADIN YOXLANILMASI (EYNİ AD VARSA İCAZƏ VERMİR)
+            let isNameTaken = globalLeaders.some(player => player.name.toLowerCase() === inputVal.toLowerCase());
             
-            if (hp <= 0) {
-                logYaz("💀 Canın bitdi! Öldün və canın 100-ə bərpa olundu.");
-                hp = 100;
+            if (isNameTaken) {
+                xeberdarliqGoster("❌ Bu nick name artıq başqa oyunçu tərəfindən götürülüb! Zəhmət olmasa başqa ad yazın.");
+                return;
             }
-            yaddaSaxla();
-            uiYenile();
+
+            playerName = inputVal;
+            document.getElementById('playerNameDisplay').innerText = playerName;
+            document.getElementById('welcome-modal').classList.add('hidden');
+            yaddasaYaz();
+        } else {
+            xeberdarliqGoster("Zəhmət olmasa bir ad yazın!");
         }
     }
 
-    function sifirla() {
-        if (confirm("Bütün tərəqqini silmək istəyirsən?")) {
-            localStorage.clear();
-            location.reload();
+    function yaddasaYaz() {
+        let oyunData = {
+            playerName: playerName,
+            suallar: suallar,
+            coin: coin,
+            hp: hp,
+            dmg: dmg,
+            canQiymeti: canQiymeti,
+            hasarQiymeti: hasarQiymeti,
+            bossLvl: bossLvl,
+            bossHp: bossHp,
+            bossDmg: bossDmg,
+            globalLeaders: globalLeaders
+        };
+        localStorage.setItem('tehsil_rpg_data', JSON.stringify(oyunData));
+    }
+
+    function yaddasdanYukle() {
+        let savedData = localStorage.getItem('tehsil_rpg_data');
+        if (savedData) {
+            let data = JSON.parse(savedData);
+            playerName = data.playerName || "";
+            suallar = data.suallar || [];
+            coin = data.coin !== undefined ? data.coin : 0;
+            hp = data.hp !== undefined ? data.hp : 100;
+            dmg = data.dmg !== undefined ? data.dmg : 10;
+            canQiymeti = data.canQiymeti || 10;
+            hasarQiymeti = data.hasarQiymeti || 10;
+            bossLvl = data.bossLvl || 1;
+            bossHp = data.bossHp || 30;
+            bossDmg = data.bossDmg || 10;
+            globalLeaders = data.globalLeaders || [];
         }
     }
 
-    function uiYenile() {
+    function liderleriGoster() {
+        let lbListArea = document.getElementById('lbListArea');
+        lbListArea.innerHTML = "";
+
+        // Mövcud oyunçunu liderlər siyahısına əlavə et/güncəllə
+        if (playerName && playerName.trim() !== "") {
+            let found = false;
+            for (let i = 0; i < globalLeaders.length; i++) {
+                if (globalLeaders[i].name === playerName) {
+                    globalLeaders[i].bossLvl = bossLvl;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                globalLeaders.push({ name: playerName, bossLvl: bossLvl });
+            }
+        }
+
+        // Boss Lvl sıralaması (Yüksəkdən aşağıya)
+        globalLeaders.sort((a, b) => b.bossLvl - a.bossLvl);
+
+        globalLeaders.forEach((player, index) => {
+            let rankText = (index + 1) + ".";
+            if (index === 0) rankText = "🥇";
+            else if (index === 1) rankText = "🥈";
+            else if (index === 2) rankText = "🥉";
+
+            let isCurrent = (player.name === playerName) ? "active-player" : "";
+
+            let itemHTML = `
+                <div class="lb-item ${isCurrent}">
+                    <span class="lb-rank">${rankText}</span>
+                    <span class="lb-name">${player.name}</span>
+                    <span class="lb-score">Boss Lvl ${player.bossLvl}</span>
+                </div>
+            `;
+            lbListArea.innerHTML += itemHTML;
+        });
+
+        document.getElementById('leaderboard-modal').classList.remove('hidden');
+    }
+
+    function liderleriBagla() {
+        document.getElementById('leaderboard-modal').classList.add('hidden');
+    }
+
+    function sifirlamaSorqusu() {
+        document.getElementById('custom-confirm').classList.remove('hidden');
+    }
+
+    function confirmBagla() {
+        document.getElementById('custom-confirm').classList.add('hidden');
+    }
+
+    function tesdiqSifirla() {
+        // Liderlər siyahısından bu oyunçunun adını silirik (Ad azad olunur)
+        if (playerName && playerName.trim() !== "") {
+            globalLeaders = globalLeaders.filter(player => player.name !== playerName);
+        }
+        
+        let localData = localStorage.getItem('tehsil_rpg_data');
+        if(localData) {
+            let parsed = JSON.parse(localData);
+            parsed.globalLeaders = globalLeaders;
+            parsed.playerName = "";
+            localStorage.setItem('tehsil_rpg_data', JSON.stringify(parsed));
+        }
+
+        localStorage.removeItem('tehsil_rpg_data');
+        location.reload();
+    }
+
+    function xeberdarliqGoster(metn) {
+        document.getElementById('alert-text').innerText = metn;
+        document.getElementById('custom-alert').classList.remove('hidden');
+    }
+
+    function alertBagla() {
+        document.getElementById('custom-alert').classList.add('hidden');
+    }
+
+    function konfetiAç() {
+        if (typeof confetti === 'function') {
+            confetti({
+                particleCount: 80,
+                spread: 60,
+                origin: { y: 0.6 }
+            });
+        }
+    }
+
+    function sarsintiEffekti() {
+        let container = document.getElementById('mainContainer');
+        container.classList.add('shake-effect');
+        setTimeout(() => {
+            container.classList.remove('shake-effect');
+        }, 400);
+    }
+
+    function statistikaniYenile() {
         document.getElementById('coinCount').innerText = coin;
         document.getElementById('hpCount').innerText = hp;
         document.getElementById('dmgCount').innerText = dmg;
+        document.getElementById('canQiymeti').innerText = canQiymeti;
+        document.getElementById('hasarQiymeti').innerText = hasarQiymeti;
+        document.getElementById('sualSayi').innerText = suallar.length;
+
         document.getElementById('bossLvl').innerText = bossLvl;
         document.getElementById('bossHp').innerText = bossHp;
         document.getElementById('bossDmg').innerText = bossDmg;
-        document.getElementById('hpPriceText').innerText = hpPrice;
-        document.getElementById('dmgPriceText').innerText = dmgPrice;
+
+        let startBtn = document.getElementById('startBtn');
+        
+        if (oyunAktivdir) {
+            startBtn.disabled = true;
+            startBtn.innerText = "⏳ Oyun Davam Edir...";
+        } else {
+            if (suallar.length >= 5) {
+                startBtn.disabled = false;
+                startBtn.innerText = "▶️ Oyuna Başla";
+            } else {
+                startBtn.disabled = true;
+                startBtn.innerText = "▶️ Oyuna Başla (Min 5 Sual)";
+            }
+        }
+
+        yaddasaYaz();
     }
 
-    function melumatGoster() {
-        logYaz("👤 " + playerName + " | Lvl: " + bossLvl + " | 🪙 " + coin);
+    function sualElaveEt() {
+        let sual = document.getElementById('sualInput').value.trim();
+        let cavab = document.getElementById('cavabInput').value.trim();
+
+        if (suallar.length >= 15) {
+            xeberdarliqGoster("Maksimum 15 sual əlavə edə bilərsiniz!");
+            return;
+        }
+
+        if (sual !== "" && cavab !== "") {
+            suallar.push({ sual: sual, cavab: cavab.toLowerCase() });
+            document.getElementById('sualInput').value = "";
+            document.getElementById('cavabInput').value = "";
+            statistikaniYenile();
+        } else {
+            xeberdarliqGoster("Zəhmət olmasa həm sualı, həm də cavabı yazın!");
+        }
+    }
+
+    function suallariSil() {
+        suallar = [];
+        oyunAktivdir = false;
+        document.getElementById('quizArea').style.display = "none";
+        document.getElementById('oyunMesaj').innerText = "";
+        statistikaniYenile();
+    }
+
+    function suallariQarisdir(array) {
+        return array.slice().sort(() => Math.random() - 0.5);
+    }
+
+    function oyunBasla() {
+        if (suallar.length < 5 || oyunAktivdir) return;
+        
+        oyunAktivdir = true;
+        aktivSuallar = suallariQarisdir(suallar);
+        cariSualIndex = 0;
+        
+        document.getElementById('quizArea').style.display = "block";
+        document.getElementById('oyunMesaj').innerText = "";
+        statistikaniYenile();
+        sualGoster();
+    }
+
+    function sualGoster() {
+        if (cariSualIndex < aktivSuallar.length) {
+            document.getElementById('sualMetni').innerText = "Sual " + (cariSualIndex + 1) + ": " + aktivSuallar[cariSualIndex].sual;
+            document.getElementById('istifadeciCavabi').value = "";
+        } else {
+            oyunAktivdir = false;
+            document.getElementById('quizArea').style.display = "none";
+            document.getElementById('oyunMesaj').style.color = "#34d399";
+            document.getElementById('oyunMesaj').innerText = "🎉 Halaldır! Bütün suallara cavab verdiniz!";
+            statistikaniYenile();
+            konfetiAç();
+        }
+    }
+
+    function cavabiYoxla() {
+        let cavab = document.getElementById('istifadeciCavabi').value.trim().toLowerCase();
+        let duzgunCavab = aktivSuallar[cariSualIndex].cavab;
+
+        if (cavab === duzgunCavab) {
+            coin += 5;
+            cariSualIndex++;
+            statistikaniYenile();
+            
+            setTimeout(() => {
+                konfetiAç();
+            }, 50);
+
+            sualGoster();
+        } else {
+            oyunAktivdir = false;
+            document.getElementById('quizArea').style.display = "none";
+            document.getElementById('oyunMesaj').style.color = "#f87171";
+            document.getElementById('oyunMesaj').innerText = "❌ Səhv cavab verdiniz!";
+            statistikaniYenile();
+            sarsintiEffekti();
+        }
+    }
+
+    function canArtir() {
+        if (hp <= 0) return;
+        if (coin >= canQiymeti) {
+            coin -= canQiymeti;
+            hp += 20;
+            canQiymeti += 5;
+            statistikaniYenile();
+        } else {
+            xeberdarliqGoster("Kifayət qədər Coin-iniz yoxdur! Sualları cavablayaraq Coin qazanın.");
+        }
+    }
+
+    function hasarArtir() {
+        if (hp <= 0) return;
+        if (coin >= hasarQiymeti) {
+            coin -= hasarQiymeti;
+            dmg += 5;
+            hasarQiymeti += 5;
+            statistikaniYenile();
+        } else {
+            xeberdarliqGoster("Kifayət qədər Coin-iniz yoxdur! Sualları cavablayaraq Coin qazanın.");
+        }
+    }
+
+    function gameOverAç() {
+        document.getElementById('game-over-screen').classList.remove('hidden');
+    }
+
+    function restartGame() {
+        document.getElementById('game-over-screen').classList.add('hidden');
+        
+        hp = 100;
+        coin = 0;
+        dmg = 10;
+        
+        canQiymeti = 10;
+        hasarQiymeti = 10;
+        
+        bossLvl = 1;
+        bossHp = 30;
+        bossDmg = 10;
+
+        oyunAktivdir = false;
+
+        document.getElementById('bossMesaj').innerText = "";
+        document.getElementById('oyunMesaj').innerText = "";
+        document.getElementById('quizArea').style.display = "none";
+        
+        statistikaniYenile();
+    }
+
+    function bossSavasi() {
+        if (hp <= 0) return;
+
+        let bossMsg = document.getElementById('bossMesaj');
+
+        if (dmg >= bossHp && hp > bossDmg) {
+            let qazanilanCoin = 50;
+            coin += qazanilanCoin;
+            hp -= bossDmg;
+
+            bossMsg.style.color = "#34d399";
+            bossMsg.innerText = "🏆 BOSS MƏĞLUB EDİLDİ! +" + qazanilanCoin + " Coin qazanıldı!";
+            
+            setTimeout(() => {
+                konfetiAç();
+            }, 50);
+
+            bossLvl++;
+            bossHp += 20;
+            bossDmg += 5;
+
+        } else {
+            hp -= bossDmg;
+            sarsintiEffekti();
+
+            if (hp <= 0) {
+                hp = 0;
+                statistikaniYenile();
+                setTimeout(() => {
+                    gameOverAç();
+                }, 300);
+                return;
+            } else {
+                bossMsg.style.color = "#f87171";
+                bossMsg.innerText = "💀 Boss sizə zərbə vurdu! -" + bossDmg + " Can itirdiniz. Gücünüzü artırın!";
+            }
+        }
+        statistikaniYenile();
     }
 </script>
+
 </body>
 </html>
