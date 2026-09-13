@@ -135,11 +135,11 @@
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
         }
-        button:hover {
+        button:hover:not(:disabled) {
             opacity: 0.95;
             transform: translateY(-1px);
         }
-        button:active {
+        button:active:not(:disabled) {
             transform: translateY(1px);
         }
         button:disabled {
@@ -197,7 +197,6 @@
             line-height: 1.6;
         }
 
-        /* --- TEST VARİANTLARI ÜÇÜN DÜYMƏLƏR --- */
         .variant-btn {
             background: rgba(30, 41, 59, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -238,7 +237,6 @@
             border-color: rgba(239, 68, 68, 0.6) !important;
         }
 
-        /* --- MODALLAR --- */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -266,7 +264,6 @@
         .btn-confirm-danger { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
         .btn-confirm-cancel { background: #475569 !important; }
 
-        /* LİDERLƏR */
         .leaderboard-list {
             max-height: 260px; overflow-y: auto; margin: 15px 0; padding-right: 5px; text-align: left;
         }
@@ -282,7 +279,6 @@
         .lb-name { flex-grow: 1; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 10px; }
         .lb-score { font-weight: 700; color: #ef4444; white-space: nowrap; }
 
-        /* GAME OVER */
         #game-over-screen {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: rgba(5, 5, 10, 0.94); backdrop-filter: blur(12px);
@@ -319,16 +315,15 @@
         <span>⚔️ <span id="dmgCount">10</span></span>
     </div>
 
-    <!-- Səviyyə Seçimi və Oyun Ərazisi -->
     <div class="box">
         <h3 style="margin-top: 0; color: #38bdf8;">🧠 Bilik Səviyyəsi</h3>
         <select id="seviyyeSelect">
-            <option value="asan">🟢 Asan Səviyyə (Ümumi Biliklər)</option>
-            <option value="orta">🟡 Orta Səviyyə (Tarix və Coğrafiya)</option>
-            <option value="cetin">🟠 Çətin Səviyyə (Elm və Məntiq)</option>
-            <option value="coxCetin">🔴 Çox Çətin Səviyyə (İleri Elmlər)</option>
+            <option value="asan">🟢 Asan Səviyyə (+5 Coin)</option>
+            <option value="orta">🟡 Orta Səviyyə (+8 Coin)</option>
+            <option value="cetin">🟠 Çətin Səviyyə (+12 Coin)</option>
+            <option value="coxCetin">🔴 Çox Çətin Səviyyə (+16 Coin)</option>
         </select>
-        <button id="startBtn" onclick="oyunBasla()" style="margin-top: 10px;">▶️ Oyuna Başla (10 Sual)</button>
+        <button id="startBtn" onclick="oyunBasla()" style="margin-top: 10px;">▶️ Oyuna Başla</button>
         
         <div id="quizArea" style="display:none; margin-top:15px;">
             <p id="sualMetni" style="font-size: 15px; font-weight: 600; color: #fbbf24; margin-bottom: 12px; text-align: left;"></p>
@@ -337,7 +332,6 @@
         <p id="oyunMesaj" class="msg"></p>
     </div>
 
-    <!-- Mağaza və Boss -->
     <div class="box">
         <h3 style="margin-top: 0; color: #fbbf24;">🏪 Mağaza & Boss</h3>
         <button class="shop-btn" onclick="canArtir()">❤️ Can (+20) - <span id="canQiymeti">10</span> Coin</button>
@@ -400,55 +394,58 @@
 </div>
 
 <script>
-    // Geniş Sual Bazası (Hər səviyyə üçün 10 unikal test sualı)
     const sualBazasi = {
         asan: [
-            { s: "Azərbaycanın paytaxtı hansıdır?", v: ["Gəncə", "Bakı", "Şəki", "Sumqayıt"], d: 1 },
-            { s: "İlin neçə ayı var?", v: ["10", "11", "12", "14"], d: 2 },
-            { s: "Göyqurşağında neçə rəng var?", v: ["5", "6", "7", "8"], d: 2 },
-            { s: "1 metr neçə santimetrdir?", v: ["10 sm", "100 sm", "1000 sm", "50 sm"], d: 1 },
-            { s: "Hansı heyvan uça bilmir?", v: ["Qaranquş", "Göyərçin", "🐧 Pinqvin", "Sərçə"], d: 2 },
-            { s: "Həftədə neçə gün var?", v: ["5 gün", "6 gün", "7 gün", "8 gün"], d: 2 },
-            { s: "Su hansı temperaturda qaynayır?", v: ["50°C", "100°C", "150°C", "200°C"], d: 1 },
-            { s: "Qızılın kimyəvi işarəsi hansıdır?", v: ["Ag", "Fe", "Au", "Cu"], d: 2 },
-            { s: "Futbol matçında bir komandada neçə oyunçu olur?", v: ["9", "10", "11", "12"], d: 2 },
-            { s: "İnsan bədənində neçə əsas hissə var (baş, gövdə...)?", v: ["3", "4", "5", "6"], d: 2 }
+            { id: "a1", s: "Azərbaycanın paytaxtı hansıdır?", v: ["Gəncə", "Bakı", "Şəki", "Sumqayıt"], d: 1 },
+            { id: "a2", s: "İlin neçə ayı var?", v: ["10", "11", "12", "14"], d: 2 },
+            { id: "a3", s: "Göyqurşağında neçə rəng var?", v: ["5", "6", "7", "8"], d: 2 },
+            { id: "a4", s: "1 metr neçə santimetrdir?", v: ["10 sm", "100 sm", "1000 sm", "50 sm"], d: 1 },
+            { id: "a5", s: "Hansı heyvan uça bilmir?", v: ["Qaranquş", "Göyərçin", "🐧 Pinqvin", "Sərçə"], d: 2 },
+            { id: "a6", s: "Həftədə neçə gün var?", v: ["5 gün", "6 gün", "7 gün", "8 gün"], d: 2 },
+            { id: "a7", s: "Su hansı temperaturda qaynayır?", v: ["50°C", "100°C", "150°C", "200°C"], d: 1 },
+            { id: "a8", s: "Qızılın kimyəvi işarəsi hansıdır?", v: ["Ag", "Fe", "Au", "Cu"], d: 2 },
+            { id: "a9", s: "Futbol matçında bir komandada neçə oyunçu olur?", v: ["9", "10", "11", "12"], d: 2 },
+            { id: "a10", s: "İnsan bədənində neçə əsas hissə var?", v: ["3", "4", "5", "6"], d: 2 },
+            { id: "a11", s: "İlk yaz ayı hansıdır?", v: ["Yanvar", "Mart", "İyun", "Sentyabr"], d: 1 },
+            { id: "a12", s: "Hansı meyvə sarıdır və meymunlar onu çox sevir?", v: ["Alma", "Banan", "Gilas", "Üzüm"], d: 1 },
+            { id: "a13", s: "5-in 4-ə vurmaqla hasili neçə edir?", v: ["18", "20", "22", "24"], d: 1 },
+            { id: "a14", s: "Günəş hansı tərəfdən çıxır?", v: ["Qərbdən", "Şimaldan", "Şərqdən", "Cənubdan"], d: 2 }
         ],
         orta: [
-            { s: "Azərbaycan Respublikası neçci ildə müstəqilliyini bərpa etmişdir?", v: ["1918", "1920", "1991", "1995"], d: 2 },
-            { s: "Dünyanın ən uzun çayı hansıdır?", v: ["Amazon", "Nil", "Missisipi", "Yanszi"], d: 1 },
-            { s: "Yer kürəsinin neçə faizi sudan ibarətdir?", v: ["~50%", "~71%", "~85%", "~30%"], d: 1 },
-            { s: "Kitabi-Dədə Qorqud dastanında əsas təpəgöz motivli boy hansıdır?", v: ["Basatın Təpəgözü öldürdüyü boy", "Uruzun tutsak olduğu boy", "Salur Kazan evinin yağmalandığı boy", "Bamsı Beyrək"], d: 0 },
-            { s: "Günəş sistemində ən böyük planet hansıdır?", v: ["Zöhrə", "Mars", "Yupiter", "Saturn"], d: 2 },
-            { s: "Nizami Gəncəvinin məşhur əsərlər toplusu necə adlanır?", v: ["Həmse (Xəmsə)", "Leyli və Məcnun", "İsgəndərnamə", "Sirlər Xəzinəsi"], d: 0 },
-            { s: "Fransanın paytaxtı hansı şəhərdir?", v: ["Berlin", "London", "Paris", "Roma"], d: 2 },
-            { s: "İşığın sürəti təqribən saniyədə neçə kilometrdir?", v: ["300 min km", "150 min km", "3 min km", "1 milyon km"], d: 0 },
-            { s: "Periodik cədvəldə 'O' hərfi hansı elementi bildirir?", v: ["Oksigen", "Osmium", "Ozon", "Hidrogen"], d: 0 },
-            { s: "Bakı Metropoliteni neçci ildə istifadəyə verilib?", v: ["1967", "1970", "1955", "1980"], d: 0 }
+            { id: "o1", s: "Azərbaycan Respublikası neçənci ildə müstəqilliyini bərpa etmişdir?", v: ["1918", "1920", "1991", "1995"], d: 2 },
+            { id: "o2", s: "Dünyanın ən uzun çayı hansıdır?", v: ["Amazon", "Nil", "Missisipi", "Yanszi"], d: 1 },
+            { id: "o3", s: "Yer kürəsinin neçə faizi sudan ibarətdir?", v: ["~50%", "~71%", "~85%", "~30%"], d: 1 },
+            { id: "o4", s: "Kitabi-Dədə Qorqud dastanında əsas təpəgöz motivli boy hansıdır?", v: ["Basatın Təpəgözü öldürdüyü boy", "Uruzun tutsak olduğu boy", "Salur Kazan evinin yağmalandığı boy", "Bamsı Beyrək"], d: 0 },
+            { id: "o5", s: "Günəş sistemində ən böyük planet hansıdır?", v: ["Zöhrə", "Mars", "Yupiter", "Saturn"], d: 2 },
+            { id: "o6", s: "Nizami Gəncəvinin məşhur əsərlər toplusu necə adlanır?", v: ["Həmse (Xəmsə)", "Leyli və Məcnun", "İsgəndərnamə", "Sirlər Xəzinəsi"], d: 0 },
+            { id: "o7", s: "Fransanın paytaxtı hansı şəhərdir?", v: ["Berlin", "London", "Paris", "Roma"], d: 2 },
+            { id: "o8", s: "İşığın sürəti təqribən saniyədə neçə kilometrdir?", v: ["300 min km", "150 min km", "3 min km", "1 milyon km"], d: 0 },
+            { id: "o9", s: "Periodik cədvəldə 'O' hərfi hansı elementi bildirir?", v: ["Oksigen", "Osmium", "Ozon", "Hidrogen"], d: 0 },
+            { id: "o10", s: "Bakı Metropoliteni neçənci ildə istifadəyə verilib?", v: ["1967", "1970", "1955", "1980"], d: 0 },
+            { id: "o11", s: "Dünyanın ən böyük okeanı hansıdır?", v: ["Atlantik", "Hind", "Sakit okean", "Şimal Buzlu"], d: 2 },
+            { id: "o12", s: "Azərbaycanın ilk demokratik respublikası (AXC) neçənci ildə yaradılıb?", v: ["1918", "1920", "1991", "1905"], d: 0 }
         ],
         cetin: [
-            { s: "Nisbilik nəzəriyyəsinin banisi kimdir?", v: ["İshak Nyuton", "Albert Eynşteyn", "Nikolas Kopernik", "Galileo Galilei"], d: 1 },
-            { s: "DNT-nin strukturu kimlər tərəfindən kəşf edilmişdir?", v: ["Watson və Crick", "Mendeleyev və Nyuton", "Darwin və Lamarck", "Pasteur və Fleming"], d: 0 },
-            { s: "İnsan bədənində ən böyük daxili orqan hansıdır?", v: ["Ürək", "Beyin", "Qaraciyər", "Ağciyər"], d: 2 },
-            { s: "Kvant mexanizminin təməl prinsipizləri arasına daxil olan 'Qeyri-müəyyənlik prinsipi' kimə məxsusdur?", v: ["Nils Bor", "Verner Heyzenberq", "Erwin Şredinger", "Maks Plank"], d: 1 },
-            { s: "Azərbaycanın ilk opera əsəri 'Leyli və Məcnun' kim tərəfindən yazılmışdır?", v: ["Üzeyir Hacıbəyov", "Muslim Maqomayev", "Fikrət Əmirov", "Qara Qarayev"], d: 0 },
-            { s: "Dünyanın ən dərin okean çökəkliyi hansıdır?", v: ["Puerto-Riko", "Marian çökəkliyi", "Sunda", "Filipin"], d: 1 },
-            { s: "Hansı qaz atmosferdə istixana effektinə ən çox səbəb olan əsas qazlardan biridir?", v: ["Oksigen", "Azot", "Karbon dioksid", "Helium"], d: 2 },
-            { s: "Romanın qurulduğu təpələr üzərindəki məşhur çay hansıdır?", v: ["Dunay", "Tibr", "Reyn", "Volqa"], d: 1 },
-            { s: "Atomun nüvəsində hansı zərrəciklər yerləşir?", v: ["Yalnız elektronlar", "Proton və neytronlar", "Elektron və protonlar", "Yalnız neytronlar"], d: 1 },
-            { s: "Dünya şöhrətli azərbaycanlı alim Lütfi Zadə hansı nəzəriyyənin banisidir?", v: ["Qeyri-səlis məntiq (Fuzzy logic)", "Nisbilik nəzəriyyəsi", "Kvant fizikası", "Genetika"], d: 0 }
+            { id: "c1", s: "Nisbilik nəzəriyyəsinin banisi kimdir?", v: ["İshak Nyuton", "Albert Eynşteyn", "Nikolas Kopernik", "Galileo Galilei"], d: 1 },
+            { id: "c2", s: "DNT-nin strukturu kimlər tərəfindən kəşf edilmişdir?", v: ["Watson və Crick", "Mendeleyev və Nyuton", "Darwin və Lamarck", "Pasteur və Fleming"], d: 0 },
+            { id: "c3", s: "İnsan bədənində ən böyük daxili orqan hansıdır?", v: ["Ürək", "Beyin", "Qaraciyər", "Ağciyər"], d: 2 },
+            { id: "c4", s: "Kvant mexanizmində 'Qeyri-müəyyənlik prinsipi' kimə məxsusdur?", v: ["Nils Bor", "Verner Heyzenberq", "Erwin Şredinger", "Maks Plank"], d: 1 },
+            { id: "c5", s: "Azərbaycanın ilk opera əsəri 'Leyli və Məcnun' kim tərəfindən yazılmışdır?", v: ["Üzeyir Hacıbəyov", "Muslim Maqomayev", "Fikrət Əmirov", "Qara Qarayev"], d: 0 },
+            { id: "c6", s: "Dünyanın ən dərin okean çökəkliyi hansıdır?", v: ["Puerto-Riko", "Marian çökəkliyi", "Sunda", "Filipin"], d: 1 },
+            { id: "c7", s: "Atmosferdə istixana effektinə ən çox səbəb olan əsas qazlardan biri hansıdır?", v: ["Oksigen", "Azot", "Karbon dioksid", "Helium"], d: 2 },
+            { id: "c8", s: "Romanın qurulduğu təpələr üzərindəki məşhur çay hansıdır?", v: ["Dunay", "Tibr", "Reyn", "Volqa"], d: 1 },
+            { id: "c9", s: "Atomun nüvəsində hansı zərrəciklər yerləşir?", v: ["Yalnız elektronlar", "Proton və neytronlar", "Elektron və protonlar", "Yalnız neytronlar"], d: 1 },
+            { id: "c10", s: "Dünya şöhrətli azərbaycanlı alim Lütfi Zadə hansı nəzəriyyənin banisidir?", v: ["Qeyri-səlis məntiq (Fuzzy logic)", "Nisbilik nəzəriyyəsi", "Kvant fizikası", "Genetika"], d: 0 }
         ],
         coxCetin: [
-            { s: "Riyaziyyatda 'Klayn şüşəsi' (Klein bottle) hansı xüsusiyyəti ilə tanınır?", v: ["İki üzü var", "Yalnız bir səthə və daxili olmayan xarici səthə malikdir", "Həcmi sonsuzdur", "Dörddəbəqəli fraktaldır"], d: 1 },
-            { s: "Termodinamikanın ikinci qanununa görə qapalı sistemdə nə artır?", v: ["Enerji", "Entropiya", "Kütlə", "Təzyiq"], d: 1 },
-            { s: "Klassik mexanikada 'Lagrangian' funksiyası hansı iki kəmiyyətin fərqidir?", v: ["Kinetik və potensial enerji", "İş və istilik", "Sürət və təcil", "Moment və qüvvə"], d: 0 },
-            { s: "Kvmant kompüterlərində məlumatın əsas vahidi necə adlanır?", v: ["Bit", "Bayt", "Kubit (Qubit)", "Hertz"], d: 2 },
-            { s: "Evklid геometriyasına daxil olmayan qeyri-Evklid geometriyalarından birini kim yaratmışdır?", v: ["Pythagoras", "Nikolai Lobaçevski", "Archimedes", "Descartes"], d: 1 },
-            { s: "Üçüncü Reyx dövründə Enigma şifrəsini qıran məşhur riyaziyyatçı kimdir?", v: ["Alan Turing", "John von Neumann", "Stephen Hawking", "Nikola Tesla"], d: 0 },
-            { s: "Astrofizikada 'Şvartsşild radiusu' nəyi müəyyən edir?", v: ["Ulduzun yaşını", "Qara dəliyin üfüq radiusunu", "Qalaktikaların uzaqlığını", "İşıq ilinin məsafəsini"], d: 1 },
-            { s: "Molekulyar biologiyada mərkəzi doqma (Central dogma) hansı ardıcıllığı izah edir?", v: ["DNT -> RNT -> Zülal", "Zülal -> DNT -> RNT", "RNT -> DNT -> Zülal", "DNT -> Zülal -> RNT"], d: 0 },
-            { s: "Kvant dolanması (Quantum entanglement) fenomenini Albert Eynşteyn necə adlandırmışdı?", v: ["Sehrli fizika", "Uzaq məsafədən qorxunc təsir", "İzah oluna bilməyən xülya", "Qeyri-mümkün əlaqə"], d: 1 },
-            { s: "Riyaziyyatda 'Euler eyniliyi' hansı beş fundamental sabiti əlaqələndirir?", v: ["0, 1, pi, e, i", "1, 2, 3, 4, 5", "pi, e,phi, c, g", "Hiperbolik sabitلər"], d: 0 }
+            { id: "cc1", s: "Riyaziyyatda 'Klayn şüşəsi' (Klein bottle) hansı xüsusiyyəti ilə tanınır?", v: ["İki üzü var", "Yalnız bir səthə və daxili olmayan xarici səthə malikdir", "Həcmi sonsuzdur", "Dörddəbəqəli fraktaldır"], d: 1 },
+            { id: "cc2", s: "Termodinamikanın ikinci qanununa görə qapalı sistemdə nə artır?", v: ["Enerji", "Entropiya", "Kütlə", "Təzyiq"], d: 1 },
+            { id: "cc3", s: "Klassik mexanikada 'Lagrangian' funksiyası hansı iki kəmiyyətin fərqidir?", v: ["Kinetik və potensial enerji", "İş və istilik", "Sürət və təcil", "Moment və qüvvə"], d: 0 },
+            { id: "cc4", s: "Kvant kompüterlərində məlumatın əsas vahidi necə adlanır?", v: ["Bit", "Bayt", "Kubit (Qubit)", "Hertz"], d: 2 },
+            { id: "cc5", s: "Qeyri-Evklid geometriyalarından birini kim yaratmışdır?", v: ["Pythagoras", "Nikolai Lobaçevski", "Archimedes", "Descartes"], d: 1 },
+            { id: "cc6", s: "Enigma şifrəsini qıran məşhur riyaziyyatçı kimdir?", v: ["Alan Turing", "John von Neumann", "Stephen Hawking", "Nikola Tesla"], d: 0 },
+            { id: "cc7", s: "Astrofizikada 'Şvartsşild radiusu' nəyi müəyyən edir?", v: ["Ulduzun yaşını", "Qara dəliyin üfüq radiusunu", "Qalaktikaların uzaqlığını", "İşıq ilinin məsafəsini"], d: 1 },
+            { id: "cc8", s: "Molekulyar biologiyada mərkəzi doqma hansı ardıcıllığı izah edir?", v: ["DNT -> RNT -> Zülal", "Zülal -> DNT -> RNT", "RNT -> DNT -> Zülal", "DNT -> Zülal -> RNT"], d: 0 }
         ]
     };
 
@@ -462,6 +459,8 @@
     let cariSeviyyeSuallari = [];
     let cariSualIndex = 0;
     let oyunAktivdir = false;
+
+    let duzgunCavablananSuallar = [];
 
     let bossLvl = 1;
     let bossHp = 30;
@@ -481,11 +480,6 @@
     function oyuncuAdiniYaddaSaxla() {
         let inputVal = document.getElementById('playerNameInput').value.trim();
         if (inputVal !== "") {
-            let isNameTaken = globalLeaders.some(p => p.name.toLowerCase() === inputVal.toLowerCase());
-            if (isNameTaken) {
-                xeberdarliqGoster("❌ Bu nick name artıq başqa oyunçu tərəfindən götürülüb!");
-                return;
-            }
             playerName = inputVal;
             document.getElementById('playerNameDisplay').innerText = playerName;
             document.getElementById('welcome-modal').classList.add('hidden');
@@ -497,13 +491,13 @@
 
     function yaddasaYaz() {
         let data = {
-            playerName, coin, hp, dmg, canQiymeti, hasarQiymeti, bossLvl, bossHp, bossDmg, globalLeaders
+            playerName, coin, hp, dmg, canQiymeti, hasarQiymeti, bossLvl, bossHp, bossDmg, globalLeaders, duzgunCavablananSuallar
         };
-        localStorage.setItem('tehsil_rpg_v2', JSON.stringify(data));
+        localStorage.setItem('tehsil_rpg_v3', JSON.stringify(data));
     }
 
     function yaddasdanYukle() {
-        let saved = localStorage.getItem('tehsil_rpg_v2');
+        let saved = localStorage.getItem('tehsil_rpg_v3');
         if (saved) {
             let d = JSON.parse(saved);
             playerName = d.playerName || "";
@@ -516,6 +510,7 @@
             bossHp = d.bossHp || 30;
             bossDmg = d.bossDmg || 10;
             globalLeaders = d.globalLeaders || [];
+            duzgunCavablananSuallar = d.duzgunCavablananSuallar || [];
         }
     }
 
@@ -543,8 +538,7 @@
     function confirmBagla() { document.getElementById('custom-confirm').classList.add('hidden'); }
 
     function tesdiqSifirla() {
-        if (playerName) globalLeaders = globalLeaders.filter(p => p.name !== playerName);
-        localStorage.removeItem('tehsil_rpg_v2');
+        localStorage.removeItem('tehsil_rpg_v3');
         location.reload();
     }
 
@@ -576,18 +570,28 @@
         yaddasaYaz();
     }
 
-    function suallariQarisdir(arr) {
-        return arr.slice().sort(() => Math.random() - 0.5);
-    }
-
     function oyunBasla() {
+        if (oyunAktivdir && cariSualIndex < cariSeviyyeSuallari.length) return;
+
         let secim = document.getElementById('seviyyeSelect').value;
         let bazadakiSuallar = sualBazasi[secim];
         
-        // Hər dəfə sualları qarışdırırıq ki, eyni sırada gəlməsin
-        cariSeviyyeSuallari = suallariQarisdir(bazadakiSuallar);
+        let qalanSuallar = bazadakiSuallar.filter(s => !duzgunCavablananSuallar.includes(s.id));
+        
+        if (qalanSuallar.length === 0) {
+            xeberdarliqGoster("🎉 Təbriklər! Bu səviyyədəki bütün sualları artıq mükəmməl öyrənmisən! Sual yaddaşın yenilənir.");
+            let sehveAitIdler = bazadakiSuallar.map(s => s.id);
+            duzgunCavablananSuallar = duzgunCavablananSuallar.filter(id => !sehveAitIdler.includes(id));
+            qalanSuallar = bazadakiSuallar;
+        }
+
+        cariSeviyyeSuallari = qalanSuallar.sort(() => Math.random() - 0.5);
         cariSualIndex = 0;
         oyunAktivdir = true;
+
+        let startBtn = document.getElementById('startBtn');
+        startBtn.disabled = true;
+        startBtn.innerText = "⏳ Oyun Davam Edir...";
 
         document.getElementById('quizArea').style.display = "block";
         document.getElementById('oyunMesaj').innerText = "";
@@ -597,7 +601,7 @@
     function sualGoster() {
         if (cariSualIndex < cariSeviyyeSuallari.length) {
             let sualObj = cariSeviyyeSuallari[cariSualIndex];
-            document.getElementById('sualMetni').innerText = `Sual ${cariSualIndex + 1}/10: ${sualObj.s}`;
+            document.getElementById('sualMetni').innerText = `Sual ${cariSualIndex + 1}/${cariSeviyyeSuallari.length}: ${sualObj.s}`;
             
             let vArea = document.getElementById('variantlarArea');
             vArea.innerHTML = "";
@@ -606,56 +610,61 @@
                 let btn = document.createElement('button');
                 btn.className = "variant-btn";
                 btn.innerText = `${["A", "B", "C", "D"][idx]}) ${variant}`;
-                btn.onclick = () => cavabiSec(idx, sualObj.d, btn);
+                btn.onclick = () => cavabiSec(sualObj, idx, sualObj.d, btn);
                 vArea.appendChild(btn);
             });
         } else {
             oyunAktivdir = false;
+            let startBtn = document.getElementById('startBtn');
+            startBtn.disabled = false;
+            startBtn.innerText = "▶️ Oyuna Başla";
+
             document.getElementById('quizArea').style.display = "none";
             document.getElementById('oyunMesaj').style.color = "#34d399";
-            document.getElementById('oyunMesaj').innerText = "🎉 Möhtəşəmdir! Bu səviyyədəki bütün sualları bitirdin!";
+            document.getElementById('oyunMesaj').innerText = "🌟 Əla! Bu mərhələdəki bütün namizəd sualları uğurla cavablandırdın!";
             konfetiAç();
         }
     }
 
-    function cavabiSec(secilenIdx, dogruIdx, secilenBtn) {
-        if (!oyunAktivdir) return;
-        oyunAktivdir = false; // Basılan kimi digər düymələri kilidləyirik
-
+    function cavabiSec(sualObj, secilenIdx, dogruIdx, secilenBtn) {
         let buttons = document.querySelectorAll('.variant-btn');
         buttons.forEach(b => b.disabled = true);
 
+        let secim = document.getElementById('seviyyeSelect').value;
+        let coinKazanci = 5; // Asan üçün standart
+        if (secim === 'orta') coinKazanci = 8;
+        else if (secim === 'cetin') coinKazanci = 12;
+        else if (secim === 'coxCetin') coinKazanci = 16;
+
         if (secilenIdx === dogruIdx) {
-            // DÜZGÜN CAVAB
             secilenBtn.classList.add('variant-correct');
-            coin += 5;
+            coin += coinKazanci;
+            
+            if (!duzgunCavablananSuallar.includes(sualObj.id)) {
+                duzgunCavablananSuallar.push(sualObj.id);
+            }
+
             statistikaniYenile();
             konfetiAç();
             document.getElementById('oyunMesaj').style.color = "#34d399";
-            document.getElementById('oyunMesaj').innerText = "✅ Doğru cavab! +5 Coin";
+            document.getElementById('oyunMesaj').innerText = `✅ Doğru cavab! +${coinKazanci} Coin (Bu sual yaddaşa yazıldı)`;
 
-            // 2 saniyə sonra növbəti suala keçid
             setTimeout(() => {
                 document.getElementById('oyunMesaj').innerText = "";
-                oyunAktivdir = true;
                 cariSualIndex++;
                 sualGoster();
             }, 2000);
 
         } else {
-            // SƏHV CAVAB
             secilenBtn.classList.add('variant-wrong');
-            // Düzgün cavabı yaşıl edib göstəririk
             buttons[dogruIdx].classList.add('variant-correct');
             
             sarsintiEffekti();
             document.getElementById('oyunMesaj').style.color = "#f87171";
-            document.getElementById('oyunMesaj').innerText = "❌ Səhv cavab!";
+            document.getElementById('oyunMesaj').innerText = "❌ Səhv cavab! (Bu sual öyrənmən üçün növbəti turlar yenə çıxacaq)";
 
-            // 2 saniyə sonra növbəti suala keçid
             setTimeout(() => {
                 document.getElementById('oyunMesaj').innerText = "";
-                oyunAktivdir = true;
                 cariSualIndex++;
                 sualGoster();
             }, 2000);
@@ -722,6 +731,11 @@
         canQiymeti = 10; hasarQiymeti = 10;
         bossLvl = 1; bossHp = 30; bossDmg = 10;
         oyunAktivdir = false;
+        
+        let startBtn = document.getElementById('startBtn');
+        startBtn.disabled = false;
+        startBtn.innerText = "▶️ Oyuna Başla";
+
         document.getElementById('quizArea').style.display = "none";
         document.getElementById('bossMesaj').innerText = "";
         document.getElementById('oyunMesaj').innerText = "";
