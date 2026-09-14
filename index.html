@@ -3,1062 +3,1233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Təhsil RPG Oyunu</title>
+    <title>Pro Boss Arena - Lobi və Gündəlik Tapşırıqlar</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.6); }
+            100% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.3); }
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+            100% { transform: translateX(0); }
+        }
+        @keyframes floatEffect {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0px); }
+        }
+
         * {
             box-sizing: border-box;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: #0b0e14;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%);
-            color: #e2e8f0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            color: #f8fafc;
             text-align: center;
-            padding: 20px 12px;
             margin: 0;
+            padding: 15px;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
-        }
-        .container {
-            width: 100%;
-            max-width: 440px;
-            background: rgba(18, 24, 38, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            padding: 24px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            word-break: break-word;
-            position: relative;
+            overflow-x: hidden;
         }
 
-        .top-bar {
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            padding: 24px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: pulseGlow 4s infinite;
+        }
+        .header-box {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
-        .player-badge {
+        .header-left {
             display: flex;
             align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 10px;
+        }
+        h2 {
+            color: #fbbf24;
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+        }
+        
+        .btn-lobby-pro {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(79, 70, 229, 0.4));
+            border: 1px solid rgba(129, 140, 248, 0.6);
+            color: #c7d2fe;
             padding: 6px 12px;
-            border-radius: 20px;
+            border-radius: 10px;
             font-size: 13px;
             font-weight: 600;
-            color: #38bdf8;
-        }
-        .quest-btn {
-            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
-            width: auto;
-            margin: 0;
             display: flex;
             align-items: center;
-            gap: 4px;
-            position: relative;
+            gap: 5px;
         }
-        .quest-btn:hover {
-            transform: translateY(-1px);
-            opacity: 0.95;
+        .btn-lobby-pro:hover {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.5), rgba(79, 70, 229, 0.7));
+            border-color: #818cf8;
+            color: #ffffff;
+            transform: translateY(-2px);
         }
 
-        .quest-notification {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ef4444;
-            color: white;
-            font-size: 10px;
-            font-weight: 900;
-            width: 18px;
-            height: 18px;
+        .level-badge {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.35));
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        
+        .arena {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(2, 6, 23, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 20px 15px;
+            margin-bottom: 18px;
+        }
+        .fighter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 44%;
+        }
+        .avatar-box {
+            font-size: 42px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%);
             border-radius: 50%;
+            width: 76px;
+            height: 76px;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
-            animation: pulseBadge 1.5s infinite;
+            margin-bottom: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            animation: floatEffect 3s ease-in-out infinite;
         }
-        @keyframes pulseBadge {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+        .fighter.shake {
+            animation: shake 0.4s ease-in-out;
         }
-        .hidden-badge {
-            display: none !important;
+        .fighter-name {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            white-space: nowrap;
+        }
+        .hp-bar-container {
+            width: 100%;
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .hp-bar-fill {
+            height: 100%;
+            width: 100%;
+            border-radius: 5px;
+            transition: width 0.4s ease;
+        }
+        .hp-text {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 5px;
+            font-weight: 600;
         }
 
-        h2 {
-            color: #f59e0b;
-            margin-top: 0;
-            margin-bottom: 18px;
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            text-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
-        }
-        .stats {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 14px;
-            border-radius: 14px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            font-size: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
-        .stats span {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        input, button, select {
+        .timer-container {
             width: 100%;
-            padding: 13px 16px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .timer-fill {
+            height: 100%;
+            background: #fbbf24;
+            width: 100%;
+            border-radius: 3px;
+            transition: width 0.1s linear;
+        }
+
+        .box {
+            background: rgba(2, 6, 23, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 18px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            text-align: left;
+        }
+        button {
+            width: 100%;
+            padding: 13px;
             margin: 6px 0;
             border-radius: 12px;
             border: none;
             font-size: 14px;
-            outline: none;
-            font-weight: 500;
-        }
-        input, select {
-            background: rgba(30, 41, 59, 0.7);
-            color: #f8fafc;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        select option {
-            background: #1e293b;
-            color: #f8fafc;
-        }
-        input:focus, select:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-            background: rgba(30, 41, 59, 0.9);
-        }
-        select:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        button {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
         }
-        button:hover:not(:disabled) {
-            opacity: 0.95;
-            transform: translateY(-1px);
-        }
-        button:active:not(:disabled) {
-            transform: translateY(1px);
-        }
-        button:disabled {
-            background: #334155;
-            color: #94a3b8;
-            box-shadow: none;
-            cursor: not-allowed;
-            opacity: 0.6;
-            transform: none;
-        }
-        .shop-btn {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
-        }
-        .boss-btn {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        .btn-start {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
             font-size: 16px;
-            margin-top: 10px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
         }
-        .reset-btn {
-            background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            margin-top: 15px;
-            box-shadow: none;
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
         }
-        .reset-btn:hover {
-            background: rgba(239, 68, 68, 0.3);
-        }
-        .box {
-            background: rgba(15, 23, 42, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 16px;
-            margin-top: 16px;
-            border-radius: 14px;
-        }
-        .box h3 {
-            font-size: 16px;
-            letter-spacing: -0.3px;
-        }
-        .msg {
-            font-weight: 600;
-            margin-top: 12px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        .boss-stats {
-            background: linear-gradient(135deg, rgba(127, 29, 29, 0.4), rgba(69, 10, 10, 0.4));
-            padding: 12px;
-            border-radius: 10px;
-            margin: 12px 0;
-            font-size: 14px;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            line-height: 1.6;
-        }
-
         .variant-btn {
             background: rgba(30, 41, 59, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #f8fafc;
+            color: #f1f5f9;
             text-align: left;
-            padding: 12px 14px;
-            margin: 6px 0;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
+            padding: 12px 16px;
         }
         .variant-btn:hover:not(:disabled) {
-            background: rgba(99, 102, 241, 0.2);
+            background: rgba(99, 102, 241, 0.25);
             border-color: #6366f1;
+            transform: translateX(6px);
         }
-        .variant-correct {
-            background: #059669 !important;
-            border-color: #10b981 !important;
-            color: #ffffff !important;
-        }
-        .variant-wrong {
-            background: #dc2626 !important;
-            border-color: #ef4444 !important;
-            color: #ffffff !important;
-        }
+        .variant-correct { background: linear-gradient(135deg, #059669, #047857) !important; color: #fff !important; transform: scale(1.02); }
+        .variant-wrong { background: linear-gradient(135deg, #dc2626, #b91c1c) !important; color: #fff !important; transform: scale(1.02); }
 
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            20% { transform: translate(-3px, 0px) rotate(-1deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            80% { transform: translate(1px, 1px) rotate(-1deg); }
-            100% { transform: translate(0px, 0px) rotate(0deg); }
-        }
-        .shake-effect {
-            animation: shake 0.4s ease-in-out;
-            border-color: rgba(239, 68, 68, 0.6) !important;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(8px);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 8888;
-        }
-        .alert-card {
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 18px;
-            padding: 22px;
-            width: 90%; max-width: 380px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        .msg {
+            font-weight: 600;
+            font-size: 13px;
+            margin-top: 12px;
             text-align: center;
-        }
-        .alert-card p {
-            margin: 0 0 16px 0;
-            font-size: 15px; color: #f1f5f9; line-height: 1.4;
-        }
-        .alert-card button {
-            background: #6366f1; color: white; padding: 11px; border-radius: 10px; margin: 4px 0; font-size: 14px;
-        }
-        .btn-confirm-danger { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
-        .btn-confirm-cancel { background: #475569 !important; }
-
-        .quest-list {
-            max-height: 280px; overflow-y: auto; margin: 15px 0; padding-right: 4px; text-align: left;
-        }
-        .quest-list::-webkit-scrollbar { width: 6px; }
-        .quest-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
-        .quest-item {
-            background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 12px 14px; border-radius: 12px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px;
-        }
-        .quest-info { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; color: #f8fafc; }
-        .quest-reward { color: #f59e0b; font-weight: 700; font-size: 12px; background: rgba(245, 158, 11, 0.1); padding: 2px 8px; border-radius: 6px; }
-        .quest-progress-bar { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden; }
-        .quest-progress-fill { height: 100%; background: #10b981; width: 0%; border-radius: 3px; }
-        .quest-footer { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
-        .quest-status { color: #94a3b8; font-weight: 600; }
-        .claim-btn {
-            background: linear-gradient(135deg, #10b981, #059669); color: white; border: none;
-            padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; width: auto; margin: 0;
-        }
-        .claim-btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
-
-        .timer-badge {
-            font-size: 12px; color: #a78bfa; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.2);
-            padding: 4px 10px; border-radius: 8px; margin-bottom: 12px; display: inline-block; font-weight: 600;
-        }
-
-        #game-over-screen {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: rgba(5, 5, 10, 0.94); backdrop-filter: blur(12px);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 9999; padding: 20px;
-        }
-        .game-over-text {
-            color: #ef4444; font-size: 48px; font-weight: 900; text-transform: uppercase; letter-spacing: 3px;
-            text-shadow: 0 0 15px rgba(239, 68, 68, 0.6); animation: pulseGameOver 1.5s infinite alternate; margin: 0 0 10px 0;
-        }
-        @keyframes pulseGameOver {
-            0% { transform: scale(1); } 100% { transform: scale(1.06); }
-        }
-        #replay-btn {
-            width: auto; min-width: 200px; padding: 16px 32px; font-size: 18px; font-weight: 700;
-            color: #ffffff; background: linear-gradient(135deg, #ef4444, #991b1b); border: none; border-radius: 14px; cursor: pointer;
+            min-height: 20px;
         }
         .hidden { display: none !important; }
+
+        .pro-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(2, 6, 23, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            margin-bottom: 12px;
+            outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .pro-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.4), inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .screen-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(2, 6, 23, 0.96);
+            backdrop-filter: blur(12px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 999;
+            padding: 15px;
+            overflow-y: auto;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .screen-btn {
+            width: auto;
+            padding: 12px 30px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .lobby-card {
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+            margin: auto;
+            text-align: left;
+            position: relative;
+        }
+        .lobby-flex-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .lobby-profile-box {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .lobby-stats-box {
+            flex: 1.3;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .stat-item {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .stat-value {
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        /* Sağ künc tapşırıq düyməsi və Modal */
+        .lobby-top-right-btns {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 6px;
+        }
+        .btn-quests-open {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.4));
+            border: 1px solid rgba(245, 158, 11, 0.6);
+            color: #fbbf24;
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-quests-open:hover {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.5), rgba(217, 119, 6, 0.7));
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .modal-overlay-custom {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(2, 6, 23, 0.75);
+            backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000;
+            padding: 15px;
+        }
+        .quest-modal-card {
+            background: rgba(15, 23, 42, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            position: relative;
+            text-align: left;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #f8fafc;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+        .modal-close-btn:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .quest-section {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .quest-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .quest-card-item {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .quest-info-area {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+        .quest-title-text {
+            font-weight: 700;
+            color: #f8fafc;
+            font-size: 11px;
+        }
+        .quest-reward-text {
+            color: #fbbf24;
+            font-size: 10px;
+            margin-top: 1px;
+            font-weight: 600;
+        }
+        .claim-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            width: auto;
+            margin: 0;
+        }
+        .claim-btn:disabled {
+            background: rgba(255, 255, 255, 0.08);
+            color: #64748b;
+            cursor: not-allowed;
+        }
+        .claimed-badge {
+            color: #34d399;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .level-select-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .lvl-btn {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            padding: 8px 0;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0;
+        }
+        .lvl-btn.unlocked {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.5);
+            color: #34d399;
+        }
+        .lvl-btn.active-lvl {
+            background: #10b981;
+            color: #fff;
+            border-color: #34d399;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+        }
+        .lvl-btn.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .confirm-card {
+            background: rgba(15, 23, 42, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 24px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+        }
+        .confirm-btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .confirm-btn-yes { flex: 1; background: #ef4444; color: white; padding: 11px; border-radius: 10px; font-weight: 700; border: none; cursor: pointer; }
+        .confirm-btn-no { flex: 1; background: rgba(255, 255, 255, 0.1); color: #f8fafc; padding: 11px; border-radius: 10px; font-weight: 700; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container" id="mainContainer">
-    <div class="top-bar">
-        <div class="player-badge">👤 <span id="playerNameDisplay">Oyuncu</span></div>
-        <button class="quest-btn" onclick="questleriGoster()">
-            📜 Tapşırıqlar
-            <span id="questBadge" class="quest-notification hidden-badge">!</span>
-        </button>
+    <div class="header-box">
+        <div class="header-left">
+            <button class="btn-lobby-pro" onclick="lobbiyeGetmekIsteyirsenmi()">
+                <span style="font-size: 15px;">🏠</span> Lobi
+            </button>
+            <h2>⚡ Arena</h2>
+        </div>
+        <div class="level-badge" id="levelBadge">Səviyyə 1</div>
     </div>
 
-    <h2>🎯 Təhsil RPG</h2>
-    
-    <div class="stats">
-        <span>🪙 <span id="coinCount">0</span></span>
-        <span>❤️ <span id="hpCount">100</span></span>
-        <span>⚔️ <span id="dmgCount">10</span></span>
+    <div class="arena">
+        <div class="fighter" id="playerFighter">
+            <div class="avatar-box">🧙‍♂️</div>
+            <div class="fighter-name" style="color: #38bdf8;" id="playerNameDisplay">Səlim</div>
+            <div class="hp-bar-container">
+                <div class="hp-bar-fill" id="playerHpFill" style="background: #10b981;"></div>
+            </div>
+            <div class="hp-text"><span id="playerHpText">100</span>/100</div>
+        </div>
+
+        <div style="font-weight: 900; color: #fbbf24; font-size: 18px;">VS</div>
+
+        <div class="fighter" id="bossFighter">
+            <div class="avatar-box" id="bossAvatarEmoji">👹</div>
+            <div class="fighter-name" style="color: #ef4444;" id="bossName">Qaranlıq Boss</div>
+            <div class="hp-bar-container">
+                <div class="hp-bar-fill" id="bossHpFill" style="background: #ef4444;"></div>
+            </div>
+            <div class="hp-text"><span id="bossHpText">100</span>/<span id="bossMaxHpText">100</span></div>
+        </div>
     </div>
 
-    <div class="box">
-        <h3 style="margin-top: 0; color: #38bdf8;">🧠 Bilik Səviyyəsi</h3>
-        <select id="seviyyeSelect">
-            <option value="asan">🟢 Asan Səviyyə (+5 Coin)</option>
-            <option value="orta">🟡 Orta Səviyyə (+8 Coin)</option>
-            <option value="cetin">🟠 Çətin Səviyyə (+12 Coin)</option>
-            <option value="coxCetin">🔴 Çox Çətin Səviyyə (+16 Coin)</option>
-        </select>
-        <button id="startBtn" onclick="oyunBasla()" style="margin-top: 10px;">▶️ Oyuna Başla</button>
-        
-        <div id="quizArea" style="display:none; margin-top:15px;">
-            <p id="sualMetni" style="font-size: 15px; font-weight: 600; color: #fbbf24; margin-bottom: 12px; text-align: left;"></p>
+    <div class="box" id="controlBox">
+        <div id="quizArea" class="hidden" style="margin-top: 5px;">
+            <div class="timer-container">
+                <div class="timer-fill" id="timerFill"></div>
+            </div>
+            <p id="sualMetni" style="font-size: 14px; font-weight: 600; color: #e2e8f0; margin-bottom: 12px; line-height: 1.4;"></p>
             <div id="variantlarArea"></div>
         </div>
         <p id="oyunMesaj" class="msg"></p>
     </div>
+</div>
 
-    <div class="box">
-        <h3 style="margin-top: 0; color: #fbbf24;">🏪 Mağaza & Boss</h3>
-        <button class="shop-btn" onclick="canArtir()">❤️ Can (+20) - <span id="canQiymeti">10</span> Coin</button>
-        <button class="shop-btn" onclick="hasarArtir()">⚔️ Hasar (+5) - <span id="hasarQiymeti">10</span> Coin</button>
-        
-        <div class="boss-stats">
-            👹 <b>Boss Lvl <span id="bossLvl">1</span></b><br>
-            🔴 Can: <span id="bossHp">30</span> | 💥 Hasar: <span id="bossDmg">10</span>
+<!-- Ad Daxiletmə Ekranı -->
+<div id="nameScreen" class="screen-overlay">
+    <h1 style="color: #fbbf24; font-size: 24px; margin-bottom: 6px; text-shadow: 0 0 10px rgba(251,191,36,0.4);">⚔️ ARENAYA XOŞ GƏLDİNİZ</h1>
+    <p style="color: #94a3b8; font-size: 13px; margin-bottom: 15px;">Zəhmət olmasa döyüşçü adınızı daxil edin:</p>
+    <div style="width: 100%; max-width: 320px;">
+        <input type="text" id="playerNameInput" class="pro-input" placeholder="Məsələn: Səlim" autocomplete="off">
+        <p id="nameErrorMsg" style="color: #ef4444; font-size: 12px; margin-top: -8px; margin-bottom: 12px; min-height: 16px;"></p>
+        <button class="screen-btn btn-start" style="width: 100%;" onclick="adiniTesdiqEt()">Davam Et</button>
+    </div>
+</div>
+
+<!-- Lobi Ekranı -->
+<div id="lobbyScreen" class="screen-overlay hidden">
+    <div class="lobby-card">
+        <!-- Sağ künc tapşırıq düyməsi -->
+        <div class="lobby-top-right-btns">
+            <button class="btn-quests-open" onclick="tapSiriqlarPenceresiniAc()">
+                <span>📜</span> Tapşırıqlar
+            </button>
         </div>
 
-        <button class="boss-btn" onclick="bossSavasi()">⚔️ Boss ilə Savaş!</button>
-        <p id="bossMesaj" class="msg"></p>
-    </div>
+        <h1 style="color: #38bdf8; font-size: 18px; margin-bottom: 2px;">🎮 OYUN LOBİSİ</h1>
+        <p style="font-size: 10px; color: #94a3b8; margin-bottom: 8px;">Mərhələni seç və döyüşə başla!</p>
+        
+        <div class="lobby-flex-container">
+            <div class="lobby-profile-box">
+                <div style="font-size: 26px; margin-bottom: 2px;">🧙‍♂️</div>
+                <div id="lobbyPlayerName" style="color: #fbbf24; font-weight: 700; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px;">Səlim</div>
+                <div id="playerTitle" style="font-size: 8px; color: #38bdf8; margin-top: 2px;">Acemi Döyüşçü</div>
+            </div>
 
-    <button class="reset-btn" onclick="sifirlamaSorqusu()">🔄 Bütün Uğurları Sıfırla</button>
-</div>
+            <div class="lobby-stats-box">
+                <div class="stat-item"><span>Sual sayı:</span><span class="stat-value" id="statTotalQ">0</span></div>
+                <div class="stat-item"><span>Düzgün:</span><span class="stat-value" id="statCorrectQ" style="color: #10b981;">0</span></div>
+                <div class="stat-item"><span>Səhv:</span><span class="stat-value" id="statWrongQ" style="color: #ef4444;">0</span></div>
+                <div class="stat-item"><span>Sikkə:</span><span class="stat-value" id="statCoins" style="color: #fbbf24;">0 🪙</span></div>
+            </div>
+        </div>
 
-<!-- GİRİŞ MODALI -->
-<div id="welcome-modal" class="modal-overlay hidden">
-    <div class="alert-card">
-        <h3 style="color: #f59e0b; margin-top: 0;">🎮 Xoş Gəldiniz!</h3>
-        <p style="font-size: 14px; color: #cbd5e1;">Oyuna başlamaq üçün adınızı daxil edin:</p>
-        <input type="text" id="playerNameInput" placeholder="Nick Name yazın..." style="margin-bottom: 12px;">
-        <button onclick="oyuncuAdiniYaddaSaxla()" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">Təsdiqlə və Başla 🚀</button>
-    </div>
-</div>
+        <div style="text-align: left; font-size: 10px; font-weight: 700; color: #94a3b8; margin-bottom: 4px;">MƏRHƏLƏLƏR:</div>
+        <div class="level-select-grid" id="levelSelectGrid"></div>
 
-<!-- TAPŞIRIQAR MODALI -->
-<div id="quest-modal" class="modal-overlay hidden">
-    <div class="alert-card">
-        <h3 style="color: #8b5cf6; margin-top: 0;">📜 Gündəlik Tapşırıqlar</h3>
-        <div class="timer-badge" id="questTimerText">⏳ Yenilənməyə: Hesablanır...</div>
-        <div class="quest-list" id="questListArea"></div>
-        <button onclick="questleriBagla()" style="background: #475569;">Bağla ✖️</button>
+        <button class="screen-btn btn-start" style="width: 100%; padding: 10px; margin-top: 5px;" onclick="lobidenOyunuBaslad()">▶️ Oyuna Başla</button>
     </div>
 </div>
 
-<!-- XƏBƏRDARLIQ -->
-<div id="custom-alert" class="modal-overlay hidden">
-    <div class="alert-card">
-        <p id="alert-text"></p>
-        <button onclick="alertBagla()">Aha, anladım 👍</button>
+<!-- Gündəlik Tapşırıqlar Modalı (Sağ küncdən açılan) -->
+<div id="questsModal" class="modal-overlay-custom hidden">
+    <div class="quest-modal-card">
+        <button class="modal-close-btn" onclick="tapSiriqlarPenceresiniBagla()">✕</button>
+        <h2 style="font-size: 15px; color: #fbbf24; margin-bottom: 4px;">📅 Gündəlik Tapşırıqlar</h2>
+        <p style="font-size: 10px; color: #ef4444; font-weight: 700; margin-bottom: 12px;" id="resetTimerText">Yenilənmə: 00:00:00</p>
+        
+        <div id="questItemsContainer"></div>
     </div>
 </div>
 
-<!-- SIFIRLAMA TƏSDİqİ -->
-<div id="custom-confirm" class="modal-overlay hidden">
-    <div class="alert-card">
-        <p style="color: #f87171; font-weight: 700; font-size: 17px;">⚠️ Əminsiniz?</p>
-        <p style="font-size: 14px; color: #cbd5e1;">Bütün coin və gücləriniz sıfırlanacaq!</p>
-        <button class="btn-confirm-danger" onclick="tesdiqSifirla()">Bəli, Sıfırla 🗑️</button>
-        <button class="btn-confirm-cancel" onclick="confirmBagla()">Xeyr 🛡️</button>
+<div id="confirmModal" class="screen-overlay hidden" style="background: rgba(2, 6, 23, 0.85);">
+    <div class="confirm-card">
+        <h2 style="color: #fbbf24; margin-bottom: 10px; font-size: 18px;">🏠 Lobiyə qayıdılsın?</h2>
+        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Hazırkı döyüş səviyyəsindəki irəliləyişiniz bitəcək.</p>
+        <div class="confirm-btn-group">
+            <button class="confirm-btn-yes" onclick="lobbiyeQayitTesdiq()">Hə</button>
+            <button class="confirm-btn-no" onclick="modaliBagla()">Xeyr</button>
+        </div>
     </div>
 </div>
 
-<!-- GAME OVER -->
-<div id="game-over-screen" class="hidden">
-    <h1 class="game-over-text">☠️ GAME OVER</h1>
-    <p style="color: #94a3b8; margin-bottom: 25px;">Məğlub oldunuz! Xallarınız sıfırlandı.</p>
-    <button id="replay-btn" onclick="restartGame()">🔄 Yenidən Başla</button>
+<div id="gameOverScreen" class="screen-overlay hidden">
+    <h1 style="color: #ef4444; font-size: 22px;">☠️ MƏĞLUB OLDUNUZ</h1>
+    <p id="finalScoreText" style="font-size: 12px; color: #94a3b8;">Səviyyə 1-də məğlub oldun!</p>
+    <button class="screen-btn" style="background: #ef4444;" onclick="lobbiyeQayitDirect()">🏠 Lobiyə Qayıt</button>
+</div>
+
+<div id="nextLevelScreen" class="screen-overlay hidden">
+    <h1 style="color: #10b981; font-size: 22px;">🎉 QƏLƏBƏ!</h1>
+    <p id="nextLevelText" style="font-size: 12px; color: #94a3b8;">Boss məğlub oldu!</p>
+    <button class="screen-btn" style="background: #10b981;" onclick="novbetiSeviyseyeGec()">▶️ Növbəti Mərhələyə Keç</button>
+</div>
+
+<div id="winScreen" class="screen-overlay hidden">
+    <h1 style="color: #fbbf24; font-size: 22px;">🏆 OYUNU BİTİRDİNİZ!</h1>
+    <p style="font-size: 12px; color: #94a3b8;">Bütün 10 səviyyəni fəth etdin!</p>
+    <button class="screen-btn" style="background: #f59e0b;" onclick="lobbiyeQayitDirect()">🏠 Lobiyə Qayıt</button>
 </div>
 
 <script>
-    // HƏR SƏVİYYƏ ÜZRƏ 50 FƏRQLİ SUAL BAZASI
-    const sualBazasi = {
-        asan: [
-            { id: "a_1", s: "Azərbaycanın paytaxtı hansı şəhərdir?", v: ["Bakı", "Gəncə", "Sumqayıt", "Şəki"], d: "Bakı" },
-            { id: "a_2", s: "Günəş sistemində neçə əsas planet var?", v: ["8", "9", "7", "10"], d: "8" },
-            { id: "a_3", s: "İnsanın normal bədən hərarəti təxminən neçə dərəcədir?", v: ["36.6", "39.0", "35.0", "37.5"], d: "36.6" },
-            { id: "a_4", s: "Müstəqil dövlət necə adlanır?", v: ["Suveren dövlət", "Vilayət", "Muxtariyyət", "Koloniya"], d: "Suveren dövlət" },
-            { id: "a_5", s: "Azərbaycan bayrağındakı qırmızı rəng nəyi simvolizə edir?", v: ["Demokratiyanı və modernləşməni", "Türkçülüyü", "İslam dinini", "Sülhü"], d: "Demokratiyanı və modernləşməni" },
-            { id: "a_6", s: "Hansı rəng qırmızı və sarının qarışığından alınır?", v: ["Narıncı", "Yaşıl", "Bənövşəyi", "Mavi"], d: "Narıncı" },
-            { id: "a_7", s: "İlin neçə ayı var?", v: ["12", "10", "4", "365"], d: "12" },
-            { id: "a_8", s: "Dünyanın ən böyük okeanı hansıdır?", v: ["Sakit okean", "Atlantik okean", "Hind okeanı", "Şimal Buzlu okeanı"], d: "Sakit okean" },
-            { id: "a_9", s: "Futbol matçı neçə hissədən ibarətdir?", v: ["2", "4", "3", "1"], d: "2" },
-            { id: "a_10", s: "Azərbaycan dilində neçə sait səs var?", v: ["9", "6", "32", "23"], d: "9" },
-            { id: "a_11", s: "İnsanın neçə əsas duyğu orqanı var?", v: ["5", "6", "4", "7"], d: "5" },
-            { id: "a_12", s: "Həftədə neçə gün var?", v: ["7", "5", "6", "10"], d: "7" },
-            { id: "a_13", s: "Su hansı temperaturda qaynayır?", v: ["100°C", "0°C", "50°C", "200°C"], d: "100°C" },
-            { id: "a_14", s: "Buz hansı temperaturda əriyir?", v: ["0°C", "10°C", "-10°C", "100°C"], d: "0°C" },
-            { id: "a_15", s: "Xəritədə yuxarı tərəf adətən hansı istiqaməti göstərir?", v: ["Şimal", "Cənub", "Şərq", "Qərb"], d: "Şimal" },
-            { id: "a_16", s: "Yer kürəsinin peyki hansıdır?", v: ["Ay", "Mars", "Venera", "Titan"], d: "Ay" },
-            { id: "a_17", s: "Azərbaycanın pul vahidi necə adlanır?", v: ["Manat", "Dollar", "Avro", "Rubl"], d: "Manat" },
-            { id: "a_18", s: "İnsan bədənində ən böyük daxili orqan hansıdır?", v: ["Qaraciyər", "Ürək", "Mədə", "Böyrək"], d: "Qaraciyər" },
-            { id: "a_19", s: "1 kiloqram neçə qramdır?", v: ["1000", "100", "10", "10000"], d: "1000" },
-            { id: "a_20", s: "Bir saat neçə dəqiqədir?", v: ["60", "30", "100", "24"], d: "60" },
-            { id: "a_21", s: "İbtidai sinifdə oxuyan şagird necə adlanır?", v: ["Şagird", "Tələbə", "Magistr", "Doktorant"], d: "Şagird" },
-            { id: "a_22", s: "Alatoran vaxt günün hansı hissəsidir?", v: ["Axşamüstü / Səhər tez", "Günorta", "Gecə yarısı", "Səhər saat 10"], d: "Axşamüstü / Səhər tez" },
-            { id: "a_23", s: "Hansı heyvan məməli deyil?", v: ["Timsah", "Balina", "Yarasalar", "Delfin"], d: "Timsah" },
-            { id: "a_24", s: "Quşların əksəriyyətinin bədəni nə ilə örtülüdür?", v: ["Lələk", "Yun", "Pulcuq", "Qabıq"], d: "Lələk" },
-            { id: "a_25", s: "İlin neçə fəsli var?", v: ["4", "2", "3", "12"], d: "4" },
-            { id: "a_26", s: "Qış fəslindən sonra hansı fəsil gəlir?", v: ["Yaz", "Yay", "Payız", "Qış"], d: "Yaz" },
-            { id: "a_27", s: "İşıqforun sarı işığı nəyi bildirir?", v: ["Hazır ol", "Keç", "Dayan", "Qaç"], d: "Hazır ol" },
-            { id: "a_28", s: "İşıqforun qırmızı işığı nəyi bildirir?", v: ["Dayan", "Keç", "Diqqət", "Sürəti artır"], d: "Dayan" },
-            { id: "a_29", s: "Kompas nəyi təyin etmək üçündür?", v: ["Cəhətləri (istiqaməti)", "Zamanı", "Temperaturu", "Havanın təzyiqini"], d: "Cəhətləri (istiqaməti)" },
-            { id: "a_30", s: "Kitab oxumaq üçün nə lazımdır?", v: ["Göz və işıq", "Yalnız səs", "Yalnız qulaq", "Ayaq"], d: "Göz və işıq" },
-            { id: "a_31", s: "Bakı şəhəri hansı dənizin sahilində yerləşir?", v: ["Xəzər dənizi", "Qara dəniz", "Aralıq dənizi", "Baltik dənizi"], d: "Xəzər dənizi" },
-            { id: "a_32", s: "Azərbaycanın dövlət dili hansıdır?", v: ["Azərbaycan dili", "İngilis dili", "Rus dili", "Türk dili"], d: "Azərbaycan dili" },
-            { id: "a_33", s: "Üçbucağın neçə tərəfi var?", v: ["3", "4", "5", "2"], d: "3" },
-            { id: "a_34", s: "Kvadratın neçə tərəfi var?", v: ["4", "3", "5", "6"], d: "4" },
-            { id: "a_35", s: "İnsanın beş əsas duyğu üzvündən biri hansıdır?", v: ["Göz (görmə)", "Ürək", "Ciyər", "Mədə"], d: "Göz (görmə)" },
-            { id: "a_36", s: "Bitkilər torpaqdan nəyi sorurlar?", v: ["Su və minerallar", "Plastik", "Dəmir", "Şüşə"], d: "Su və minerallar" },
-            { id: "a_37", s: "Arılar nə istehsal edir?", v: ["Bal", "Süd", "İpək", "Yun"], d: "Bal" },
-            { id: "a_38", s: "İnək bizə nə verir?", v: ["Süd", "Yumurta", "Bal", "Pambıq"], d: "Süd" },
-            { id: "a_39", s: "Toyuq nə doğur?", v: ["Yumurta", "Süd", "Bal", "Un"], d: "Yumurta" },
-            { id: "a_40", s: "Futbol oyununda qapını qoruyan oyunçu necə adlanır?", v: ["Qapıçı", "Hücumçu", "Müdafiəçi", "Hakim"], d: "Qapıçı" },
-            { id: "a_41", s: "Bir gündə neçə saat var?", v: ["24", "12", "60", "365"], d: "24" },
-            { id: "a_42", s: "Qələm nə üçündür?", v: ["Yazmaq və çəkmək", "Yemək", "İçmək", "Uçmaq"], d: "Yaz/çəkmək üçün" },
-            { id: "a_43", s: "Kompüterin ekranı necə adlanır?", v: ["Monitor", "Klaviatura", "Siçan", "Konka"], d: "Monitor" },
-            { id: "a_44", s: "Telefonla nə etmək olar?", v: ["Danışmaq və mesaj yazmaq", "Yemək bişirmək", "Ayaqqabı təmizləmək", "Ev tikmək"], d: "Danışmaq və mesaj yazmaq" },
-            { id: "a_45", s: "Yağış haradan yağır?", v: ["Buluddan", "Yerdən", "Ağacdan", "Dağdan"], d: "Buluddan" },
-            { id: "a_46", s: "Gecələr göydə nə görünür?", v: ["Ay və ulduzlar", "Günəş", "Buludsuz mavi səma", "Göy qurşağı"], d: "Ay və ulduzlar" },
-            { id: "a_47", s: "Gündüzlər göydə nə görünür?", v: ["Günəş", "Ay", "Yalnız ulduzlar", "Qütb parıltısı"], d: "Günəş" },
-            { id: "a_48", s: "Qarpız meyvə yoxsa tərəvəz ailəsinə aiddir?", v: ["Yosun/bostan bitkisi (Giləmeyvə)", "Ət məhsulu", "Dəmir", "Metal"], d: "Yosun/bostan bitkisi (Giləmeyvə)" },
-            { id: "a_49", s: "İdmanla məşq etmək insana nə qazandırır?", v: ["Sağlamlıq və güc", "Xəstəlik", "Yorğunluq", "Tənbəllik"], d: "Sağlamlıq və güc" },
-            { id: "a_50", s: "Məktəbə nə üçün gedirik?", v: ["Bilik öyrənmək üçün", " Yatmaq üçün", "Oynamaq üçün", "Mağaza açmaq üçün"], d: "Bilik öyrənmək üçün" }
+    const seviyyeSuallari = {
+        1: [
+            { s: "Azərbaycanın paytaxtı hansı şəhərdir?", v: ["Bakı", "Gəncə", "Sumqayıt", "Şəki"], d: "Bakı" },
+            { s: "Günəş sistemində neçə əsas planet var?", v: ["8", "9", "7", "10"], d: "8" },
+            { s: "Suyun kimyəvi düsturu hansıdır?", v: ["H2O", "CO2", "O2", "NaCl"], d: "H2O" },
+            { s: "Üçbucağın neçə tərəfi var?", v: ["3", "4", "5", "6"], d: "3" },
+            { s: "Həftədə neçə gün var?", v: ["7", "5", "6", "10"], d: "7" }
         ],
-        orta: [
-            { id: "o_1", s: "Nizami Gəncəvinin məşhur 'Xəmsə'sinə neçə poema daxildir?", v: ["5", "4", "6", "7"], d: "5" },
-            { id: "o_2", s: "Dövri sistemin (Mendeleyev cədvəli) banisi kimdir?", v: ["Dmitri Mendeleyev", "Albert Eynşteyn", "İsaak Nyuton", "Nikolas Kopernik"], d: "Dmitri Mendeleyev" },
-            { id: "o_3", s: "Yer kürəsinin ətrafında ən sürətli fırlanan təbəqə hansıdır?", v: ["Atmosfer", "Litosfer", "Biosfer", "Hidrosfer"], d: "Atmosfer" },
-            { id: "o_4", s: "Kitabi-Dədə Qorqud dastanında neçə boy var?", v: ["12", "13", "10", "15"], d: "12" },
-            { id: "o_5", s: "Suyun kimyəvi düsturu hansıdır?", v: ["H2O", "CO2", "O2", "NaCl"], d: "H2O" },
-            { id: "o_6", s: "İşığın sürəti təxminən saniyədə neçə kilometrdir?", v: ["300 000 km/san", "150 000 km/san", "1 000 km/san", "3 000 km/san"], d: "300 000 km/san" },
-            { id: "o_7", s: "Azərbaycan Respublikasının Konstitusiyası neçənci ildə qəbul edilib?", v: ["1995", "1991", "1993", "2001"], d: "1995" },
-            { id: "o_8", s: "Dünyanın ən uzun çayı hansıdır?", v: ["Nil", "Amazon", "Missisipi", "Yantszı"], d: "Nil" },
-            { id: "o_9", s: "Kompüterin 'beyni' sayılan əsas hissə necə adlanır?", v: ["Prosessor (CPU)", "Operativ yaddaş (RAM)", "Ana plata", "Hard disk"], d: "Prosessor (CPU)" },
-            { id: "o_10", s: "Dünyada ən çox danışılan ana dili hansıdır?", v: ["Mandarin (Çin)", "İngilis", "İspan", "Hindi"], d: "Mandarin (Çin)" },
-            { id: "o_11", s: "Azərbaycanın görkəmli bəstəkarı, ilk operanın müəllifi kimdir?", v: ["Üzeyir Hacıbəyov", "Qara Qarayev", "Fikrət Əmirov", "Niyazi"], d: "Üzeyir Hacıbəyov" },
-            { id: "o_12", s: "Dünyanın ən hündür dağı hansıdır?", v: ["Everest", "Kəpəz", "Şahdağ", "Elbrus"], d: "Everest" },
-            { id: "o_13", s: "İnsan bədənində neçə əsas qan qrupu var?", v: ["4", "2", "3", "6"], d: "4" },
-            { id: "o_14", s: "Havanın əsas hissəsini hansı qaz təşkil edir?", v: ["Azot", "Oksigen", "Karbon qazı", "Hidrogen"], d: "Azot" },
-            { id: "o_15", s: "Fransanın paytaxtı hansı şəhərdir?", v: ["Paris", "London", "Berlin", "Roma"], d: "Paris" },
-            { id: "o_16", s: "İtaliyanın paytaxtı hansı şəhərdir?", v: ["Roma", "Madrid", "Afina", "Paris"], d: "Roma" },
-            { id: "o_17", s: "Azərbaycan Respublikasının müstəqillik günü hansı tarixdir?", v: ["18 Oktyabr", "28 May", "9 Noyabr", "31 Dekabr"], d: "18 Oktyabr" },
-            { id: "o_18", s: "Azərbaycan Xalq Cümhuriyyətinin yarandığı tarix hansıdır?", v: ["28 May 1918", "18 Oktyabr 1991", "26 Fevral 1992", "20 Yanvar 1990"], d: "28 May 1918" },
-            { id: "o_19", s: "Dünyada neçə okean var?", v: ["5", "4", "6", "3"], d: "5" },
-            { id: "o_20", s: "Yer kürəsinin neçə faizi su ilə örtülüdür?", v: ["Təxminən 71%", "Təxminən 30%", "Təxminən 50%", "Təxminən 90%"], d: "Təxminən 71%" },
-            { id: "o_21", s: "Təbiətdə ən sərt mineral hansıdır?", v: ["Almaz", "Qızıl", "Dəmir", "Gümüş"], d: "Almaz" },
-            { id: "o_22", s: "Günəşə ən yaxın planet hansıdır?", v: ["Merkuri", "Venera", "Mars", "Yupiter"], d: "Merkuri" },
-            { id: "o_23", s: "Günəş sisteminin ən böyük planeti hansıdır?", v: ["Yupiter", "Saturn", "Neptun", "Yer"], d: "Yupiter" },
-            { id: "o_24", s: "Qırmızı planet kimi tanınan planet hansıdır?", v: ["Mars", "Venera", "Merkuri", "Saturn"], d: "Mars" },
-            { id: "o_25", s: "İnsanın sümük sistemi təxminən neçə sümükdən ibarətdir?", v: ["206", "150", "300", "100"], d: "206" },
-            { id: "o_26", s: "Azərbaycanın milli qəhrəmanı Mübariz İbrahimov hansı rayonda şəhid olmuşdur?", v: ["Tərtər", "Füzuli", "Ağdam", "Cəbrayıl"], d: "Tərtər" },
-            { id: "o_27", s: "Dünyanın ən dərin gölü hansıdır?", v: ["Bayqal", "Viktoriya", "Xəzər", "Superior"], d: "Bayqal" },
-            { id: "o_28", s: "Dəmirin kimyəvi işarəsi necədir?", v: ["Fe", "Cu", "Ag", "Au"], d: "Fe" },
-            { id: "o_29", s: "Qızılın kimyəvi işarəsi necədir?", v: ["Au", "Ag", "Fe", "Pb"], d: "Au" },
-            { id: "o_30", s: "Gümüşün kimyəvi işarəsi necədir?", v: ["Ag", "Au", "Cu", "Hg"], d: "Ag" },
-            { id: "o_31", s: "Azərbaycan ədəbiyyatında 'Leyli və Məcnun' əsərinin müəllimi kimdir?", v: ["Nizami Gəncəvi", "Füzuli", "Nəsimi", "Xaqani"], d: "Nizami Gəncəvi" },
-            { id: "o_32", s: "Böyük Azərbaycan şairi Məhəmməd Füzulinin ana dili ilə yanaşı yazdığı digər əsas dillər hansılardır?", v: ["Fars və ərəb", "İngilis və fransız", "Rus və alman", "İspan və italyan"], d: "Fars və ərəb" },
-            { id: "o_33", s: "Kompüter yaddaşının əsas ölçü vahidi nədir?", v: ["Bayt", "Hertz", "Volt", "Amper"], d: "Bayt" },
-            { id: "o_34", s: "1 Kilobayt neçə Baytdır?", v: ["1024", "1000", "512", "2048"], d: "1024" },
-            { id: "o_35", s: "İnternet şəbəkəsinin qısa adı nədir?", v: ["WWW", "CPU", "RAM", "USB"], d: "WWW" },
-            { id: "o_36", s: "Azərbaycanın rəsmi pul nişanı (manat) simvolu hansıdır?", v: ["₼", "$", "€", "£"], d: "₼" },
-            { id: "o_37", s: "Avropa İttifaqının paytaxtı sayılan (əsas mərkəzi) şəhər hansıdır?", v: ["Brüssel", "Paris", "Berlin", "Roma"], d: "Brüssel" },
-            { id: "o_38", s: "Dünyada ən çox ada sahib olan ölkə hansıdır?", v: ["İsveç", "Kanada", "Rusiya", "ABŞ"], d: "İsveç" },
-            { id: "o_39", s: "Futbol üzrə Dünya Çempionatı adətən neçə ildən bir keçirilir?", v: ["4 ildən bir", "2 ildən bir", "Hər il", "5 ildən bir"], d: "4 ildən bir" },
-            { id: "o_40", s: "Olimpiya oyunlarında neçə halqadan ibarət rəmz var?", v: ["5", "4", "6", "3"], d: "5" },
-            { id: "o_41", s: "Azərbaycanın ilk Milli Parkı hansıdır?", v: ["Ordubad Milli Parkı", "Göygöl Milli Parkı", "Şahdağ Milli Parkı", "Hirkan Milli Parkı"], d: "Ordubad Milli Parkı" },
-            { id: "o_42", s: "Xəzər dənizi daxilə axarlı yoxsa axarsız göl/dəniz hesab olunur?", v: ["Axarsız qapalı su hövzəsi", "Açıq okean", "Çay", "Bulaq"], d: "Axarsız qapalı su hövzəsi" },
-            { id: "o_43", s: "Dünyanın ən qədim şəhərlərindən biri olan Bərdə hansı dövlətin paytaxtı olub?", v: ["Partav / Albaniya", "Atropatena", "Şirvanşahlar", "Səfəvilər"], d: "Partav / Albaniya" },
-            { id: "o_44", s: "İnsanın qanını bütün bədənə pompalamaqla vəzifəli orqan hansıdır?", v: ["Ürək", "Ağciyər", "Böyrək", "Mədə"], d: "Ürək" },
-            { id: "o_45", s: "Bitkilərdə yaşıl rəngi verən maddə necə adlanır?", v: ["Xlorofil", "Hemoglobin", "Protein", "Plazma"], d: "Xlorofil" },
-            { id: "o_46", s: "Azərbaycanın görkəmli dramaturqu, 'Müsyö Jordan və Dərviş Məstəli Şah' əsərinin müəllifi kimdir?", v: ["Mirzə Fətəli Axundzadə", "Cəlil Məmmədquluzadə", "Nəriman Nərimanov", "Abdürrəhim bəy Haqverdiyev"], d: "Mirzə Fətəli Axundzadə" },
-            { id: "o_47", s: "Satirika jurnalı olan 'Molla Nəsrəddin' neçənci ildə nəşrə başlayıb?", v: ["1906", "1918", "1905", "1920"], d: "1906" },
-            { id: "o_48", s: "Dünyanın ən böyük səhrası hansıdır?", v: ["Saxara", "Qobi", "Kalaqari", "Atakama"], d: "Saxara" },
-            { id: "o_49", s: "Azərbaycanın ən uzun çayı hansıdır?", v: ["Kür", "Araz", "Samur", "Qanıx"], d: "Kür" },
-            { id: "o_50", s: "Yer kürəsinin öz oxu ətrafında bir tam dövr etməsi üçün nə qədər vaxt lazımdır?", v: ["24 saat (1 gün)", "365 gün", "1 ay", "12 saat"], d: "24 saat (1 gün)" }
+        2: [
+            { s: "Dünyanın ən böyük okeanı hansıdır?", v: ["Sakit okean", "Atlantik", "Hind", "Şimal Buzlu"], d: "Sakit okean" },
+            { s: "1 Kilobayt neçə Baytdır?", v: ["1024", "1000", "512", "2048"], d: "1024" },
+            { s: "İşığın sürəti təxminən saniyədə neçə kilometrdir?", v: ["300 000 km", "150 000 km", "1 000 km", "3 000 km"], d: "300 000 km" },
+            { s: "Azərbaycan bayrağındakı göy rəng nəyi simvolizə edir?", v: ["Türkçülüyü", "İslamı", "Sülhü", "İnqilabı"], d: "Türkçülüyü" },
+            { s: "Yer kürəsində neçə okean var?", v: ["5", "4", "6", "7"], d: "5" }
         ],
-        cetin: [
-            { id: "c_1", s: "Nisbilik nəzəriyyəsinin müəllifi kimdir?", v: ["Albert Eynşteyn", "Stiven Hokinq", "Nikolas Tesla", "Makyavelli"], d: "Albert Eynşteyn" },
-            { id: "c_2", s: "DNT-nin qoşa spiral strukturunu kəşf edən alimlər kimlərdir?", v: ["Uotson və Krik", "Mendeleyev və Nyuton", "Darvin və Mendel", "Paster və Küri"], d: "Uotson və Krik" },
-            { id: "c_3", s: "Azərbaycan Xalq Cümhuriyyəti neçənci ildə elan olunub?", v: ["1918", "1920", "1917", "1922"], d: "1918" },
-            { id: "c_4", s: "İnsan bədənində ən güclü əzələ hansıdır?", v: ["Çeynəmə əzələsi", "Bud əzələsi", "Bazu əzələsi", "Ürək əzələsi"], d: "Çeynəmə əzələsi" },
-            { id: "c_5", s: "Kvant fizikasının banilərindən biri olan Max Plank enerjinin hansı paylar şəklində yayıldığını demişdir?", v: ["Kvant (paket)", "Dalğa", "Atom", "Elektron"], d: "Kvant (paket)" },
-            { id: "c_6", s: "Dünyanın ən dərin okean çökəkliyi hansıdır?", v: ["Marian çökəkliyi", "Puerto-Riko", "Sunda", "Tonga"], d: "Marian çökəkliyi" },
-            { id: "c_7", s: "BMT (Birləşmiş Millətlər Təşkilatı) neçənci ildə yaradılıb?", v: ["1945", "1939", "1950", "1918"], d: "1945" },
-            { id: "c_8", s: "Fotosintez prosesi zamanı bitki hansı qazı udur?", v: ["Karbon qazı", "Oksigen", "Azot", "Hidrogen"], d: "Karbon qazı" },
-            { id: "c_9", s: "Dünyanın ən qədim yazılı abidələrindən biri olan Gilqameş dastanının mənşəyi haradandır?", v: ["Mesopotamiya (Şumer)", "Qədim Misir", "Qədim Yunanıstan", "Çin"], d: "Mesopotamiya (Şumer)" },
-            { id: "c_10", s: "İnsan genomunda təxminən neçə xromosom cütü var?", v: ["23", "22", "24", "46"], d: "23" },
-            { id: "c_11", s: "Fizikada qüvvənin ölçü vahidi nədir?", v: ["Nyuton", "Joul", "Vatt", "Paskal"], d: "Nyuton" },
-            { id: "c_12", s: "Təzyiqin ölçü vahidi beynəlxalq sistemdə necə adlanır?", v: ["Paskal", "Nyuton", "Coul", "Amper"], d: "Paskal" },
-            { id: "c_13", s: "Enerji və ya işin ölçü vahidi nədir?", v: ["Joul", "Vatt", "Volt", "Ohm"], d: "Joul" },
-            { id: "c_14", s: "Elektrik cərəyanı şiddətinin ölçü vahidi nədir?", v: ["Amper", "Volt", "Ohm", "Vatt"], d: "Amper" },
-            { id: "c_15", s: "Elektrik gərginliyinin ölçü vahidi nədir?", v: ["Volt", "Amper", "Coul", "Hertz"], d: "Volt" },
-            { id: "c_16", s: "Azərbaycanın görkəmli mütəfəkkiri Həsən bəy Zərdabi tərəfindən nəşr olunan ilk milli qəzetimiz necə adlanırdı?", v: ["Əkinçi", "Ziya", "Kəşkül", "İrşad"], d: "Əkinçi" },
-            { id: "c_17", s: "'Əkinçi' qəzeti neçənci ildə çap olunmağa başlamışdır?", v: ["1875", "1903", "1890", "1850"], d: "1875" },
-            { id: "c_18", s: "Azərbaycanın parlaq şairəsi Xurşidbanu Natəvan hansı xanlıq hökmdarının nəvəsi idi?", v: ["Qarabağ xanı Mehdiqulu xanın", "Bakı xanlığının", "Şəki xanlığının", "Gəncə xanlığının"], d: "Qarabağ xanı Mehdiqulu xanın" },
-            { id: "c_19", s: "Ümumdünya Səhiyyə Təşkilatının (ÜST / WHO) qərargahı harada yerləşir?", v: ["Cenevrə, İsveçrə", "Paris, Fransa", "London, Böyük Britaniya", "Nyu-York, ABŞ"], d: "Cenevrə, İsveçrə" },
-            { id: "c_20", s: "Radioaktivliyi kəşf edən fizik kimdir?", v: ["Henri Bekkerel", "Albert Eynşteyn", "Pyotr Küri", "Tomas Edison"], d: "Henri Bekkerel" },
-            { id: "c_21", s: "Penisillini (ilk antibiotiki) kəşf edən alim kimdir?", v: ["Aleksandr Flemminq", "Lui Paster", "Robert Kox", "Dmitri İvanovski"], d: "Aleksandr Flemminq" },
-            { id: "c_22", s: "Qədim yunan filosofu Sokratın ən məşhur tələbəsi kim olmuşdur?", v: ["Platon", "Aristotel", "Pifaqor", "Epikur"], d: "Platon" },
-            { id: "o_23", s: "Platonun akademiyasında təhsil almış və sonradan Lıkey məktəbini yaratmış filosof kimdir?", v: ["Aristotel", "Sokrat", "Demokrit", "Heraklit"], d: "Aristotel" },
-            { id: "c_24", s: "Dünyanın ən böyük yarımadası hansıdır?", v: ["Ərəbistan yarımadası", "Skandinaviya yarımadası", "Hind-Çin yarımadası", "Labrador yarımadası"], d: "Ərəbistan yarımadası" },
-            { id: "c_25", s: "İnsanın genetik məlumatlarını daşıyan DNT molekulu hüceyrənin harasında yerləşir?", v: ["Nüvədə", "Mitoxondridə", "Ribosomda", "Sitoplazmada"], d: "Nüvədə" },
-            { id: "c_26", s: "İşıq il müddətində nəyi ölçür?", v: ["Məsafəni", "Zamanı", "Sürəti", "Parlaqlığı"], d: "Məsafəni" },
-            { id: "c_27", s: "Günəş işığının Yerə çatması üçün təxminən nə qədər vaxt lazımdır?", v: ["8 dəqiqə 20 saniyə", "1 saat", "24 saat", "30 saniyə"], d: "8 dəqiqə 20 saniyə" },
-            { id: "c_28", s: "Hüceyrə nəzəriyyəsinin banilərindən olan alman bioloq kimdir?", v: ["Mattias Şleyden və Teodor Şvann", "Çarlz Darvin və Qreqor Mendel", "Lui Paster və Robert Huk", "Carl Linney"], d: "Mattias Şleyden və Teodor Şvann" },
-            { id: "c_29", s: "Azərbaycanın geologiyasında neftqazlılıq baxımından zəngin olan 'Asiman' strukturu hansı akvatoriyada yerləşir?", v: ["Xəzər dənizinin Azərbaycan sektoru", "Kür çayı hövzəsi", "Gəncəbasar", "Qarabağ düzü"], d: "Xəzər dənizinin Azərbaycan sektoru" },
-            { id: "c_30", s: "Dünyada ilk kosmonavt Yuri Qaqarin kosmosa neçənci ildə uçmuşdur?", v: ["1961", "1957", "1969", "1971"], d: "1961" },
-            { id: "c_31", s: "İnsanın ayaq basdığı ilk səma cismi (Ay) üzərinə çıxan ilk insan kimdir?", v: ["Nil Armstronq", "Yuri Qaqarin", "Bazz Oldrin", "Maykl Kollinz"], d: "Nil Armstronq" },
-            { id: "c_32", s: "Dünyanın ən uzun dağ silsiləsi hansıdır?", v: ["And dağları", "Kordilyer", "Himalay", "Alp dağları"], d: "And dağları" },
-            { id: "c_33", s: "İqtisadiyyatda inflyasiya nə deməkdir?", v: ["Pulun alıcılıq qabiliyyətinin düşməsi / qiymətlərin artması", "İşsizliyin azalması", "İstehsalın artması", "Valyutanın möhkəmlənməsi"], d: "Pulun alıcılıq qabiliyyətinin düşməsi / qiymətlərin artması" },
-            { id: "c_34", s: "Azərbaycan Respublikasının Dövlət Himninin musiqisinin bəstəkarı kimdir?", v: ["Üzeyir Hacıbəyov", "Fikrət Əmirov", "Səid Rüstəmov", "Cahangir Cahangirov"], d: "Üzeyir Hacıbəyov" },
-            { id: "c_35", s: "Azərbaycan Respublikasının Dövlət Himninin sözlərinin müəllifi kimdir?", v: ["Əhməd Cavad", "Səməd Vurğun", "Mikayıl Müşfiq", "Bəxtiyar Vahabzadə"], d: "Əhməd Cavad" },
-            { id: "c_36", s: "Kimyada oksidləşmə-reduksiya reaksiyalarında elektron itirən proses necə adlanır?", v: ["Oksidləşmə", "Reduksiya", "Hidroliz", "İzomerləşmə"], d: "Oksidləşmə" },
-            { id: "c_37", s: "Dövri sistemdə atom nömrəsi 1 olan element hansıdır?", v: ["Hidrogen", "Helium", "Litium", "Karbon"], d: "Hidrogen" },
-            { id: "c_38", s: "Havanın temperaturunun hündürlüklə əlaqədar dəyişməsi necədir?", v: ["Hər 1000 metrə yaxınlaşdıqca təxminən 6 gradus aşağı düşür", "Hər metrə görə artır", "Dəyişmir", "Həmişə eynidir"], d: "Hər 1000 metrə yaxınlaşdıqca təxminən 6 gradus aşağı düşür" },
-            { id: "c_39", s: "Təbiətdə suyun dövranı əsasən hansı qüvvənin təsiri ilə baş verir?", v: ["Günəş enerjisi və qravitasiya", "Yalnız külək", "Yalnız maqnit sahəsi", "Kompüter dalğaları"], d: "Günəş enerjisi və qravitasiya" },
-            { id: "c_40", s: "Dünyanın ən məşhur axtarış sistemlərindən biri olan Google neçənci ildə təsis olunub?", v: ["1998", "1991", "2004", "2000"], d: "1998" },
-            { id: "c_41", s: "Azərbaycanın ilk opera əsəri olan 'Leyli və Məcnun' ilk dəfə neçənci ildə səhnələşdirilib?", v: ["1908", "1910", "1920", "1900"], d: "1908" },
-            { id: "c_42", s: "Müasir kompüterlərin arxitekturasının əsas prinsiplərini verən alim kimdir?", v: ["Con Fon Neyman", "Alan Türinq", "Blez Paskal", "Çarlz Bebc"], d: "Con Fon Neyman" },
-            { id: "c_43", s: "İnformatikada 'Süni intellekt' anlayışını ilk dəfə elmi dövriyyəyə daxil edən konfrans harada keçirilmişdir?", v: ["Dartmut Kolleci (1956)", "Oksford Universiteti", "Harvard Universiteti", "Stanford Universiteti"], d: "Dartmut Kolleci (1956)" },
-            { id: "c_44", s: "Azərbaycanın məşhur memarı, Şirvanşahlar Saray kompleksinin memarı kimdir? (Dəqiq adı bilinməsə də tarixi abidədir)", v: ["Şirvanşahlar dövrü memarlığı", "Sinan", "Əcəmi Naxçıvani", "Zaha Hadid"], d: "Şirvanşahlar dövrü memarlığı" },
-            { id: "c_45", s: "Naxçıvanda Möminə Xatun türbəsinin memarı kimdir?", v: ["Əcəmi Naxçıvani", "imarət ustası", "Memar Əhməd", "Zeynalabdin"], d: "Əcəmi Naxçıvani" },
-            { id: "c_46", s: "İnsan bədənində ən böyük oynaq hansıdır?", v: ["Diz oynağı", "Çiyin oynağı", "Dirsək oynağı", "Bud oynağı"], d: "Diz oynağı" },
-            { id: "c_47", s: "Yer kürəsinin maqnit qütbləri coğrafi qütblərlə tam üst-üstə düşür mü?", v: ["Xeyr, müəyyən qədər meyllidir", "Bəli, tamamilə üst-üstə düşür", "Həmişə eyni nöqtədədir", "Heç vaxt maqnit sahəsi yoxdur"], d: "Xeyr, müəyyən qədər meyllidir" },
-            { id: "c_48", s: "Dünyanın ən duzlu dənizi / gölü hansıdır?", v: ["Ölü dəniz (Dead Sea)", "Xəzər dənizi", "Qırmızı dəniz", "Aral gölü"], d: "Ölü dəniz (Dead Sea)" },
-            { id: "c_49", s: "Optikada işığın bir mühitdən digər mühitə keçərkən istiqamətini dəyişməsi necə adlanır?", v: ["İşıq sınması (Refraksiya)", "İşıq əks olunması", "İntervensiya", "Diffraksiya"], d: "İşıq sınması (Refraksiya)" },
-            { id: "c_50", s: "Akustikada səsin ucalığı nə ilə ölçülür?", v: ["Desibel (dB)", "Hertz", "Metr", "Volt"], d: "Desibel (dB)" }
+        3: [
+            { s: "Azərbaycanın ən hündür zirvəsi hansıdır?", v: ["Bazardüzü", "Şahdağ", "Tufandağ", "Ağrı dağı"], d: "Bazardüzü" },
+            { s: "DNT-nin strukturu kimlər tərəfindən kəşf edilmişdir?", v: ["Ceyms Uotson və Frensis Krik", "İsaak Nyuton", "Tomas Edison", "Qaliley Qaliley"], d: "Ceyms Uotson və Frensis Krik" },
+            { s: "1 Bayt neçə bitdən ibarətdir?", v: ["8", "4", "16", "32"], d: "8" },
+            { s: "Pifaqor teoremi hansı həndəsi figura aiddir?", v: ["Düzbucaqlı üçbucaq", "Çevrə", "Dördbucaqlı", "Kub"], d: "Düzbucaqlı üçbucaq" },
+            { s: "Qızılın kimyəvi simvolu hansıdır?", v: ["Au", "Ag", "Fe", "Cu"], d: "Au" }
         ],
-        coxCetin: [
-            { id: "cc_1", s: "Termodinamikanın birinci qanunu əslində nəyin saxlanması qanunudur?", v: ["Enerjinin saxlanması", "İmpulstun saxlanması", "Kütlənin saxlanması", "Entropiyanın saxlanması"], d: "Enerjinin saxlanması" },
-            { id: "cc_2", s: "Qara dəliklərin ətrafında işığın belə qaça bilmədiyi sərhəd necə adlanır?", v: ["Hadisə üfüqü (Event Horizon)", "Sinqulyarlıq", "Akresiya diski", "Foton sferası"], d: "Hadisə üfüqü (Event Horizon)" },
-            { id: "cc_3", s: "Heydər Əliyev adına Bakı-Tbilisi-Ceyhan neft boru kəməri istismara neçənci ildə verilib?", v: ["2006", "2005", "2004", "2008"], d: "2006" },
-            { id: "cc_4", s: "Matematikada 'Qızıl nisbət' (Golden Ratio) təxminən hansı ədədə bərabərdir?", v: ["1.618", "3.141", "2.718", "1.414"], d: "1.618" },
-            { id: "cc_5", s: "Atom nüvəsini bir yerdə saxlayan əsas fundamental qüvvə necə adlanır?", v: ["Güclü nüvə qarşılıqlı təsiri", "Zəif qarşılıqlı təsir", "Elektromaqnit qüvvəsi", "Qravitasiya"], d: "Güclü nüvə qarşılıqlı təsiri" },
-            { id: "cc_6", s: "Kvant mexanikasında məşhur 'Şrödinger pişiyi' paradoksu nəyi nümayiş etdirmək üçün irəli sürülüb?", v: ["Superpozisiya və qeyri-müəyyənliyi", "Nisbilik nəzəriyyəsini", "İşıq sürətinin sabitliyini", "Termodinamikanı"], d: "Superpozisiya və qeyri-müəyyənliyi" },
-            { id: "cc_7", s: "Azərbaycanın ilk peyki olan 'Azerspace-1' orbitə neçənci ildə buraxılıb?", v: ["2013", "2012", "2015", "2010"], d: "2013" },
-            { id: "cc_8", s: "Hüceyrənin 'enerji stansiyası' hesab edilən orqanoid hansıdır?", v: ["Mitoxondri", "Ribosom", "Lizosom", "Nüvəcik"], d: "Mitoxondri" },
-            { id: "cc_9", s: "Yer kürəsinin maqnit sahəsini əsasən hansı təbəqə yaradır?", v: ["Xarici nüvə (maye dəmir)", "Qabıq", "Mantiya", "Daxili nüvə"], d: "Xarici nüvə (maye dəmir)" },
-            { id: "cc_10", s: "İyirminci əsrin əvvəllərində kvant nəzəriyyəsinin banisi hesab edilən alman fizik kimdir?", v: ["Max Plank", "Nils Bor", "Verner Heyzenberq", "Erwin Şrödinger"], d: "Max Plank" },
-            { id: "cc_11", s: "Eyler-Lagrange tənlikləri fizikanın və riyaziyyatın hansı sahəsinin təməlini təşkil edir?", v: ["Analitik mexanika və Variasiya hesabı", "Kvant mexanikası", "Nisbilik nəzəriyyəsi", "Statistik fizika"], d: "Analitik mexanika və Variasiya hesabı" },
-            { id: "cc_12", s: "Matematikada 'Klayn şüşəsi' (Klein Bottle) hansı xüsusiyyəti ilə tanınır?", v: ["Birüzlüdür və daxili ilə xarici sərhədi yoxdur", "Adi üçölçülü qapalı həcmi var", "Yalnız dörddəbir müstəvidə olur", "Həndəsi olaraq sonsuz həcmə malikdir"], d: "Birüzlüdür və daxili ilə xarici sərhədi yoxdur" },
-            { id: "cc_13", s: "Kvant kompüterlərində informasiyanın əsas ölçü vahidi necə adlanır?", v: ["Qubit (Quantum Bit)", "Bayt", "Tranzistor", "Pikosekund"], d: "Qubit (Quantum Bit)" },
-            { id: "cc_14", s: "Fizikada 'Hayzenberqin qeyri-müəyyənlik prinsipi' hansı iki kəmiyyətin eyni anda dəqiq ölçülə bilməyəcəyini deyir?", v: ["İmпульs və Koordinat", "Kütlə və Sürət", "Enerji və Həcm", "Zaman və Temperatur"], d: "İmпульs və Koordinat" },
-            { id: "cc_15", s: "Stiven Hokinqin qara dəliklərlə bağlı irəli sürdüyü və onların istilik şüalandırdığını iddia edən nəzəriyyə necə adlanır?", v: ["Hokinq şüalanması", "Qara radiasiya", "Sinqulyarlıq şüası", "Termal üfüq"], d: "Hokinq şüalanması" },
-            { id: "cc_16", s: "Azərbaycanın kosmik agentliyi (Azərkosmos) neçənci ildə yaradılmışdır?", v: ["2010", "2013", "2008", "2015"], d: "2010" },
-            { id: "cc_17", s: "Molekulyar biologiyada 'Mərkəzi Doqma' (Central Dogma) məlumatın hansı ardıcıllıqla ötürüldüyünü ifadə edir?", v: ["DNT -> RNT -> Zülal", "Zülal -> RNT -> DNT", "RNT -> DNT -> Zülal", "DNT -> Zülal -> RNT"], d: "DNT -> RNT -> Zülal" },
-            { id: "cc_18", s: "Termodinamikanın ikinci qanununa görə qapalı sistemlərdə hansı kəmiyyət həmişə artır və ya sabit qalır?", v: ["Entropiya", "Daxili enerji", "Enthalpiya", "Mexaniki iş"], d: "Entropiya" },
-            { id: "cc_19", s: "Kvant dolanması (Quantum Entanglement) fenomenini Albert Eynşteyn hansı məşhur ifadə ilə tənqid etmişdir?", v: ["Uzaq məsafədən xəvər-əlaqə (Spooky action at a distance)", "Tanrı zər atmır", "İşıq sürəti aşılmazdır", "Kvant sadəcə ehtimaldır"], d: "Uzaq məsafədən xəvər-əlaqə (Spooky action at a distance)" },
-            { id: "cc_20", s: "Riyaziyyatda 'Riman fərziyyəsi' (Riemann Hypothesis) hansı riyazi obyektin paylanması ilə əlaqədardır?", v: ["Sadə ədədlər və Zeta funksiyası", "Fibonaççi ardıcıllığı", "Triqonometrik funksiyalar", "Matris determinantları"], d: "Sadə ədədlər və Zeta funksiyası" },
-            { id: "cc_21", s: "Astrofizikada 'Pulsarlar' əslində nədir?", v: ["Sürətlə fırlanan maqnitləşmiş neytron ulduzları", "Qara dəliklərin nüvəsi", "Yeni yaranan qaz buludları", "Qırmızı nəhənglər"], d: "Sürətlə fırlanan maqnitləşmiş neytron ulduzları" },
-            { id: "cc_22", s: "Ümumi nisbilik nəzəriyyəsinə görə qravitasiya əslində nədir?", v: ["Fəza-zaman əyriliyi", "İki kütlənin bir-birini cismani cəzb etməsi", "Maqnit sahəsinin təsiri", "Elektromaqnit dalğası"], d: "Fəza-zaman əyriliyi" },
-            { id: "cc_23", s: "Hüceyrə dövrünün (Cell Cycle) DNT sintezi baş verən mərhələsi necə adlanır?", v: ["S fazası (Synthesis)", "G1 fazası", "G2 fazası", "M fazası (Mitoz)"], d: "S fazası (Synthesis)" },
-            { id: "cc_24", s: "Genetik kodun əsasını təşkil edən nukleotid əsaslarından adeinin qarşısına həmişə hansı əsas gəlir?", v: ["Timin", "Guanin", "Sitozin", "Urasil"], d: "Timin" },
-            { id: "cc_25", s: "RNT molekulunda Timin (T) əvəzinə hansı azotlu əsas olur?", v: ["Urasil (U)", "Adenin (A)", "Guanin (G)", "Sitozin (C)"], d: "Urasil (U)" },
-            { id: "cc_26", s: "Azərbaycan Respublikasının ən yüksək zirvəsi olan Bazardüzü dağının hündürlüyü nə qədərdir?", v: ["4466 metr", "4485 metr", "4240 metr", "3621 metr"], d: "4466 metr" },
-            { id: "cc_27", s: "Klassik mexanikanın təməlini qoyan İsaak Nyutonun əsas əsəri necə adlanır?", v: ["Philosophiæ Naturalis Principia Mathematica", "Optiks", "Metod haqqında mühakimə", "Nisbilik"], d: "Philosophiæ Naturalis Principia Mathematica" },
-            { id: "cc_28", s: "Elektronun dalğa təbiətini (korpuskulyar-dalğa dualizmini) irəli sürən fransız fizik kimdir?", v: ["Lui de Broyl", "Maks Plank", "Nils Bor", "Pol Dirak"], d: "Lui de Broyl" },
-            { id: "cc_29", s: "Kvant elektrodinamikasının inkişafına görə Nobel mükafatı almış məşhur amerikalı fizik kimdir?", v: ["Riçard Feynman", "Enriko Fermi", "Robert Oppenhaymer", "Ernest Rezerford"], d: "Riçard Feynman" },
-            { id: "cc_30", s: "Dünyanın ən dərin süni quyusu olan Kola superdərin quyusu harada yerləşir?", v: ["Rusiya (Murmansk vilayəti)", "ABŞ (Texas)", "Kanada", "Səudiyyə Ərəbistanı"], d: "Rusiya (Murmansk vilayəti)" },
-            { id: "cc_31", s: "Superkeçiricilik fenomeni ilk dəfə neçənci ildə və hansı fizik tərəfindən kəşf edilmişdir?", v: ["1911-ci ildə Heike Kamerlingh Onnes", "1950-ci ildə Bardin", "1986-cı ildə Bednorz", "1900-cü ildə Tesla"], d: "1911-ci ildə Heike Kamerlingh Onnes" },
-            { id: "cc_32", s: "Kosmosda ulduzlararası məsafələri ölçmək üçün ən çox istifadə olunan uzunluq vahidi hansıdır?", v: ["Parsek və İşıq ili", "Kilometr", "Astronomik vahid (AU)", "Metr"], d: "Parsek və İşıq ili" },
-            { id: "cc_33", s: "Yerin öz oxu ətrafında fırlanma sürətinin qütblərə doğru getdikcə dəyişməsi necədir?", v: ["Sürət sıfıra enir", "Sürət artır", "Eyni qalır", "Tərsinə fırlanır"], d: "Sürət sıfıra enir" },
-            { id: "cc_34", s: "DNT zəncirini bir-birinə bağlayan əsas kimyəvi rabitə növü hansıdır?", v: ["Hidrogen rabitəsi", "Kovalent rabitə", "İon rabitəsi", "Metallik rabitə"], d: "Hidrogen rabitəsi" },
-            { id: "cc_35", s: "İnsanın mərkəzi sinir sistemi hansı iki əsas hissədən ibarətdir?", v: ["Baş beyin və Onurğa beyin", "Simpatik və Parasimpatik", "Motor və Sensor sinirlər", "Ürək və Ciyər"], d: "Baş beyin və Onurğa beyin" },
-            { id: "cc_36", s: "Plazma fizikasında maddənin dördüncü halı olan plazma nədir?", v: ["İonlaşmış qaz", "Maye hal", "Sıxılmış bərk cisim", "Soyuq qaz"], d: "İonlaşmış qaz" },
-            { id: "cc_37", s: "Azərbaycan elmində qeyri-səlis məntiq (Fuzzy Logic) nəzəriyyəsinin banisi kimdir?", v: ["Lütfi Zadə", "Zahid Xəlilov", "Əşrəf Hüseynov", "Mirəli Qaşqay"], d: "Lütfi Zadə" },
-            { id: "cc_38", s: "Lütfi Zadənin qeyri-səlis məntiq nəzəriyyəsi elmi dünyaya ilk dəfə neçənci ildə təqdim olunub?", v: ["1965", "1975", "1955", "1980"], d: "1965" },
-            { id: "cc_39", s: "Riyaziyyatda 'Fermanın Böyük Teoremi'ni neçənci ildə isbat etmişdir (sonradan)?", v: ["1994-cü ildə Endrü Uayls", "1700-cü ildə", "1850-ci ildə", "Hələ də isbat olunmayıb"], d: "1994-cü ildə Endrü Uayls" },
-            { id: "cc_40", s: "Kompüter elmlərində 'P versus NP' problemi nəyi araşdırır?", v: ["Hesablama mürəkkəbliyini", "İnternet sürətini", "Tranzistorların həcmini", "Əməliyyat sistemlərinin təhlükəsizliyini"], d: "Hesablama mürəkkəbliyini" },
-            { id: "cc_41", s: "Maddənin tamamilə antimaddə ilə reaksiyaya girərək saf enerjiyə çevrilməsi prosesi necə adlanır?", v: ["Annihilyasiya", "Fissiya", "Sintez", "Sublimasiya"], d: "Annihilyasiya" },
-            { id: "cc_42", s: "Günəşin nüvəsində hansı növ nüvə reaksiyası baş verir?", v: ["Nüvə sintezi (Fuziya - hidrogenin heliuma çevrilməsi)", "Nüvə parçalanması (Fissiya)", "Kimyəvi yanma", "Elektron tutulması"], d: "Nüvə sintezi (Fuziya - hidrogenin heliuma çevrilməsi)" },
-            { id: "cc_43", s: "Dünyanın ən güclü işlək elmi qurğularından biri olan Böyük Adron Kollayderi (LHC) hansı təşkilata məxsusdur?", v: ["CERN", "NASA", "ESA", "ROSCOSMOS"], d: "CERN" },
-            { id: "cc_44", s: "CERN təşkilatı hansı ölkələrin sərhədində yerləşir?", v: ["İsveçrə və Fransa", "ABŞ və Kanada", "Almaniya və Avstriya", "Yaponiya və Çin"], d: "İsveçrə və Fransa" },
-            { id: "cc_45", s: "Fizikada 'Kazimir effekti' (Casimir Effect) nəyi sübut edir?", v: ["Boş fəzanın (vakuumun) kvant dalğalanmalarına malik olduğunu", "Qravitasiyanın sonsuzluğunu", "İşıq sürətinin dəyişkənliyini", "Atomun daxili boşluğunu"], d: "Boş fəzanın (vakuumun) kvant dalğalanmalarına malik olduğunu" },
-            { id: "cc_46", s: "Matematikada 'Navier-Stokes tənlikləri' nəyi təsvir edir?", v: ["Maye və qazların hərəkətini (hidroaerodinamika)", "Bərk cisimlərin deformasiyasını", "İşıq dalğalarını", "Elektrik sahələrini"], d: "Maye və qazların hərəkətini (hidroaerodinamika)" },
-            { id: "cc_47", s: "Kvant kompüterlərində məlumat daşıyıcılarının birtərəfli və ya ikitərəfli əlaqəli olması hansı fiziki xassəyə əsaslanır?", v: ["Superpozisiya və Dolanma (Entanglement)", "İstilikkeçirmə", "Maqnit rezonansı", "Optik linza"], d: "Superpozisiya və Dolanma (Entanglement)" },
-            { id: "cc_48", s: "Azərbaycanın geofizikasında palçıq vulkanlarının öyrənilməsində dünya üzrə lider ölkə olmasının əsas səbəbi nədir?", v: ["Dünya palçıq vulkanlarının yarıdan çoxunun burada yerləşməsi", "Neftin olmaması", "Yalnız dağlıq olması", "Böyük səhraların mövcudluğu"], d: "Dünya palçıq vulkanlarının yarıdan çoxunun burada yerləşməsi" },
-            { id: "cc_49", s: "Astrofizikada 'Habbll qanunu' nəyi izah edir?", v: ["Kainatın genişləndiyini və qalaktikaların uzaqlaşdığını", "Ulduzların yaşını", "Qara dəliklərin çəkisini", "Planetlərin orbitini"], d: "Kainatın genişləndiyini və qalaktikaların uzaqlaşdığını" },
-            { id: "cc_50", s: "Elmi fəlsəfədə 'Elmi inqilabların strukturu' əsərinin müəllifi və 'paradiqma' anlayışını elmə gətirən filosof kimdir?", v: ["Tomas Kun", "Karl Popper", "Pyer Dyuhem", "Immanuel Kant"], d: "Tomas Kun" }
+        4: [
+            { s: "Kvant fizikasının banisi kim hesab olunur?", v: ["Maks Plank", "Albert Eynşteyn", "Nils Bor", "Stiven Hokinq"], d: "Maks Plank" },
+            { s: "Yer kürəsinin atmosferinin təxminən neçə faizi azotdur?", v: ["78%", "21%", "1%", "50%"], d: "78%" },
+            { s: "Nisbilik nəzəriyyəsini irəli sürən fizik kimdir?", v: ["Albert Eynşteyn", "İsaak Nyuton", "Nikola Tesla", "Maykl Faradey"], d: "Albert Eynşteyn" },
+            { s: "İnsanın genetik kodunu daşıyan molekul necə adlanır?", v: ["DNT", "RNT", "Protein", "Ferment"], d: "DNT" },
+            { s: "İnsanın normal bədən hərarəti neçə dərəcədir?", v: ["36.6", "39.0", "35.0", "37.5"], d: "36.6" }
+        ],
+        5: [
+            { s: "Mütləq sıfır nöqtəsi Celsius şkalası ilə neçə dərəcədir?", v: ["-273.15 °C", "-100 °C", "0 °C", "-500 °C"], d: "-273.15 °C" },
+            { s: "İnsan orqanizmində ən sərt toxuma hansıdır?", v: ["Diş minası", "Sümük", "Qığırdaq", "Dəri"], d: "Diş minası" },
+            { s: "Atomun nüvəsində hansı hissəciklər yerləşir?", v: ["Proton və Neytron", "Yalnız Elektron", "Proton və Elektron", "Neytron və Elektron"], d: "Proton və Neytron" },
+            { s: "İşıq ili ölçü vahidi nəyi ölçmək üçündür?", v: ["Məsafəni", "Zamanı", "Sürəti", "Kütləni"], d: "Məsafəni" },
+            { s: "İnsan bədənində neçə əsas qrup qan var?", v: ["4", "2", "3", "6"], d: "4" }
+        ],
+        6: [
+            { s: "Kimyada 'pH' şkalası nəyi ölçür?", v: ["Turşuluq və əsasiyi", "Temperaturu", "Təzyiqi", "Sıxlığı"], d: "Turşuluq və əsasiyi" },
+            { s: "Yer kürəsinin Günəş ətrafında tam dövr etmə müddəti nə qədərdir?", v: ["365 gün 6 saat", "365 gün", "366 gün", "300 gün"], d: "365 gün 6 saat" },
+            { s: "Hansı element 'H' hərfi ilə işarələnir?", v: ["Hidrogen", "Helyum", "Litiyum", "Hafnium"], d: "Hidrogen" },
+            { s: "Dünyanın ən kiçik müstəqil dövləti hansıdır?", v: ["Vatikan", "Monako", "San-Marino", "Lixtenşteyn"], d: "Vatikan" },
+            { s: "Hansı planet 'Qırmızı planet' adlanır?", v: ["Mars", "Venera", "Yupiter", "Saturn"], d: "Mars" }
+        ],
+        7: [
+            { s: "Fizikada enerjinin beynəlxalq vahidi hansıdır?", v: ["Coul (Joule)", "Vatt", "Nyuton", "Paskal"], d: "Coul (Joule)" },
+            { s: "Havanın əsas tərkib hissəsi hansı qazdır?", v: ["Azot", "Oksigen", "Karbon qazı", "Arqon"], d: "Azot" },
+            { s: "Dünyanın ən hündür şəlaləsi hansıdır?", v: ["Anhel", "Niaqara", "Viktoriya", "İquasu"], d: "Anhel" },
+            { s: "Günəş sistemində ən böyük planet hansıdır?", v: ["Yupiter", "Saturn", "Neptun", "Uran"], d: "Yupiter" },
+            { s: "Azərbaycan Respublikasının Dövlət Himninin musiqisinin bəstəkarı kimdir?", v: ["Üzeyir Hacıbəyov", "Fikrət Əmirov", "Niyazi", "Qara Qarayev"], d: "Üzeyir Hacıbəyov" }
+        ],
+        8: [
+            { s: "Dünyada ən çox danışılan ana dili hansıdır?", v: ["Mandarin (Çin dili)", "İngilis dili", "İspan dili", "Hind dili"], d: "Mandarin (Çin dili)" },
+            { s: "Hüceyrənin 'enerji stansiyası' adlanan orqanoidi hansıdır?", v: ["Mitoxondri", "Ribosom", "Lizosom", "Vakuol"], d: "Mitoxondri" },
+            { s: "İnsanın qanında oksigeni daşıyan əsas zülal necə adlanır?", v: ["Hemoqlobin", "İnsulin", "Keratin", "Kollagen"], d: "Hemoqlobin" },
+            { s: "Mendeleyev cədvəlində 1 nömrəli element hansıdır?", v: ["Hidrogen", "Helium", "Litium", "Karbon"], d: "Hidrogen" },
+            { s: "Azərbaycanın ilk demokratik respublikası neçənci ildə yaradılıb?", v: ["1918", "1920", "1991", "1905"], d: "1918" }
+        ],
+        9: [
+            { s: "İnsanın immun sistemində əsas rol oynayan hüceyrələr necə adlanır?", v: ["Leukositlər", "Eritrositlər", "Trombositlər", "Neyronlar"], d: "Leukositlər" },
+            { s: "Havanın təzyiqini ölçmək üçün istifadə olunan cihaz hansıdır?", v: ["Barometr", "Termometr", "Higrometre", "Anemometr"], d: "Barometr" },
+            { s: "Günəşə ən yaxın olan planet hansıdır?", v: ["Venera", "Merkuri", "Mars", "Yer"], d: "Merkuri" },
+            { s: "BMT-nin əsas mənzil-qərargahı haradadır?", v: ["Nyu-York, ABŞ", "Cenevrə, İsveçrə", "Vyana, Avstriya", "Brüssel, Belçika"], d: "Nyu-York, ABŞ" },
+            { s: "Suyun qaynama temperaturu dəniz səviyyəsində neçə dərəcədir?", v: ["100 °C", "90 °C", "120 °C", "80 °C"], d: "100 °C" }
+        ],
+        10: [
+            { s: "İnsan bədənində ən böyük sinir hansıdır?", v: ["Oturaq sinir", "Vagus siniri", "Fasial sinir", "Optik sinir"], d: "Oturaq sinir" },
+            { s: "Dünyanın ən böyük ada ölkəsi hansıdır?", v: ["İndoneziya", "Madagaskar", "Yaponiya", "Yeni Zelandiya"], d: "İndoneziya" },
+            { s: "İnternet atası kimi tanınan elm adamı kimdir?", v: ["Tim Berners-Li", "Vint Cerf", "Bil Geyts", "Stiv Jobs"], d: "Vint Cerf" },
+            { s: "Kosmosa uçan ilk qadın kosmonavt kimdir?", v: ["Valentina Tereşkova", "Salli Ride", "Mae Jemison", "Elena Kondakova"], d: "Valentina Tereşkova" },
+            { s: "Azərbaycanın ilk professional rəssamı kimdir?", v: ["Bəhruz Kəngərli", "Azim Əzimzadə", "Səhlul Bəhlulzadə", "Tahir Salahov"], d: "Bəhruz Kəngərli" }
         ]
     };
 
-    // Oyun Dəyişənləri
-    let oyuncuAdi = localStorage.getItem("rpg_oyuncuAdi") || "";
-    let coin = parseInt(localStorage.getItem("rpg_coin")) || 0;
-    let hp = parseInt(localStorage.getItem("rpg_hp")) || 100;
-    let maxHp = parseInt(localStorage.getItem("rpg_maxHp")) || 100;
-    let dmg = parseInt(localStorage.getItem("rpg_dmg")) || 10;
-    let canQiymeti = parseInt(localStorage.getItem("rpg_canQiymeti")) || 10;
-    let hasarQiymeti = parseInt(localStorage.getItem("rpg_hasarQiymeti")) || 10;
+    let playerName = "Səlim";
+    let playerHp = 100;
+    let cariSeviyye = 1;
+    let maxUnlockedLevel = 1; 
+    let bossMaxHp = 100;
+    let bossHp = 100;
     
-    let bossLvl = parseInt(localStorage.getItem("rpg_bossLvl")) || 1;
-    let bossMaxHp = parseInt(localStorage.getItem("rpg_bossMaxHp")) || 30;
-    let bossHp = parseInt(localStorage.getItem("rpg_bossHp")) || 30;
-    let bossDmg = parseInt(localStorage.getItem("rpg_bossDmg")) || 10;
+    let totalQuestions = 0;
+    let correctQuestions = 0;
+    let wrongQuestions = 0;
+    let playerCoins = 0;
 
-    let cariSual = null;
-    
-    // Düzgün cavablanan sualların ID-ləri (hər səviyyə üzrə ayrı saxlanılır)
-    let dogruCavablananlar = JSON.parse(localStorage.getItem("rpg_dogruCavablananlar")) || {
-        asan: [], orta: [], cetin: [], coxCetin: []
+    let dailyQuests = [];
+    let lastResetTimestamp = 0;
+    let lobbyTimerInterval = null;
+
+    let timerInterval = null;
+    let timeLeft = 20;
+    let oyunBitdi = false;
+
+    let sehvEdilenlerNovbesi = [];
+    let aktivSualHavasi = [];
+
+    const bossAdlarVEmojiler = {
+        1: { ad: "Qaranlıq Goblin", emoji: "👹" },
+        2: { ad: "Alovlu Ork", emoji: "👺" },
+        3: { ad: "Cadugər Lord", emoji: "🧙‍♂️" },
+        4: { ad: "Qara Əjdaha", emoji: "🐉" },
+        5: { ad: "Daş Qoliaf", emoji: "🗿" },
+        6: { ad: "Kibertron", emoji: "🤖" },
+        7: { ad: "Zombi Kral", emoji: "🧟" },
+        8: { ad: "Vampir Hesab", emoji: "🧛" },
+        9: { ad: "Kosmik Kabus", emoji: "👽" },
+        10: { ad: "Kainat Lordu", emoji: "🌌" }
     };
-
-    // Gündəlik Tapşırıqlar Sistemi
-    let quests = JSON.parse(localStorage.getItem("rpg_quests")) || [
-        { id: 1, text: "3 dəfə düzgün cavab ver", target: 3, progress: 0, reward: 25, claimed: false },
-        { id: 2, text: "Mağazadan hər hansı gücləndirmə al", target: 1, progress: 0, reward: 20, claimed: false },
-        { id: 3, text: "1 Boss məğlub et", target: 1, progress: 0, reward: 40, claimed: false }
-    ];
-    let questResetTime = parseInt(localStorage.getItem("rpg_questResetTime")) || (Date.now() + 24 * 60 * 60 * 1000);
 
     window.onload = function() {
-        if (!oyuncuAdi) {
-            document.getElementById("welcome-modal").classList.remove("hidden");
+        let qeydEdilmisData = localStorage.getItem("proBossArenaData");
+        if (qeydEdilmisData) {
+            let data = JSON.parse(qeydEdilmisData);
+            playerName = data.name;
+            maxUnlockedLevel = data.maxLevel || 1;
+            totalQuestions = data.totalQ || 0;
+            correctQuestions = data.correctQ || 0;
+            wrongQuestions = data.wrongQ || 0;
+            playerCoins = data.coins || 0;
+            dailyQuests = data.quests || [];
+            lastResetTimestamp = data.lastReset || 0;
+
+            gundelikSifirlanmaniYoxla();
+            document.getElementById("playerNameDisplay").textContent = playerName;
+            document.getElementById("lobbyPlayerName").textContent = playerName;
+            document.getElementById("nameScreen").classList.add("hidden");
+            lobiniYenile();
+            document.getElementById("lobbyScreen").classList.remove("hidden");
         } else {
-            document.getElementById("playerNameDisplay").textContent = oyuncuAdi;
+            setNovbeSifirlamaVaxti();
+            generateDailyQuests();
+            document.getElementById("nameScreen").classList.remove("hidden");
         }
-        guncelleUI();
-        yoxlaQuestBildirisleri();
-        setInterval(taymeriYenile, 1000);
     };
 
-    function oyuncuAdiniYaddaSaxla() {
-        const inputVal = document.getElementById("playerNameInput").value.trim();
+    function melumatlariYaddaSaxla() {
+        const oyunData = {
+            name: playerName,
+            maxLevel: maxUnlockedLevel,
+            totalQ: totalQuestions,
+            correctQ: correctQuestions,
+            wrongQ: wrongQuestions,
+            coins: playerCoins,
+            quests: dailyQuests,
+            lastReset: lastResetTimestamp
+        };
+        localStorage.setItem("proBossArenaData", JSON.stringify(oyunData));
+    }
+
+    function setNovbeSifirlamaVaxti() {
+        let indikiZaman = new Date();
+        let hedefVaxt = new Date();
+        hedefVaxt.setHours(12, 0, 0, 0);
+
+        if (indikiZaman.getTime() >= hedefVaxt.getTime()) {
+            hedefVaxt.setDate(hedefVaxt.getDate() + 1);
+        }
+        lastResetTimestamp = hedefVaxt.getTime();
+    }
+
+    function gundelikSifirlanmaniYoxla() {
+        let indikiZaman = new Date().getTime();
+        if (lastResetTimestamp === 0 || indikiZaman >= lastResetTimestamp || dailyQuests.length === 0) {
+            setNovbeSifirlamaVaxti();
+            generateDailyQuests();
+            melumatlariYaddaSaxla();
+        }
+    }
+
+    function generateDailyQuests() {
+        dailyQuests = [
+            { id: 1, type: "easy", title: "1 Boss məğlub et", target: 1, current: 0, reward: 30, claimed: false },
+            { id: 2, type: "medium", title: "3 düzgün cavab ver", target: 3, current: 0, reward: 60, claimed: false },
+            { id: 3, type: "hard", title: "5 düzgün cavab ver", target: 5, current: 0, reward: 120, claimed: false }
+        ];
+    }
+
+    function adiniTesdiqEt() {
+        let inputVal = document.getElementById("playerNameInput").value.trim();
+        let errorMsg = document.getElementById("nameErrorMsg");
+
         if (inputVal.length < 2) {
-            showAlert("Zəhmət olmasa düzgün bir ad daxil edin (minimum 2 hərf).");
+            errorMsg.textContent = "⚠️ Ad ən az 2 hərfdən ibarət olmalıdır!";
             return;
         }
-        oyuncuAdi = inputVal;
-        localStorage.setItem("rpg_oyuncuAdi", oyuncuAdi);
-        document.getElementById("playerNameDisplay").textContent = oyuncuAdi;
-        document.getElementById("welcome-modal").classList.add("hidden");
-        showAlert(`Xoş gəldin, ${oyuncuAdi}! Macəran başlayır 🚀`);
+
+        playerName = inputVal;
+        document.getElementById("playerNameDisplay").textContent = playerName;
+        document.getElementById("lobbyPlayerName").textContent = playerName;
+        
+        melumatlariYaddaSaxla();
+        document.getElementById("nameScreen").classList.add("hidden");
+        lobiniYenile();
+        document.getElementById("lobbyScreen").classList.remove("hidden");
+    }
+
+    function lobiniYenile() {
+        gundelikSifirlanmaniYoxla();
+        istatistikleriGuncelle();
+        unvaniHesabla();
+        seviyyeGridiniQur();
+        gundelikTapSiriqlarUIUpdate();
+        lobiSaygaciniBaslat();
+        melumatlariYaddaSaxla();
+    }
+
+    function tapSiriqlarPenceresiniAc() {
+        document.getElementById("questsModal").classList.remove("hidden");
+    }
+
+    function tapSiriqlarPenceresiniBagla() {
+        document.getElementById("questsModal").classList.add("hidden");
+    }
+
+    function lobiSaygaciniBaslat() {
+        if (lobbyTimerInterval) clearInterval(lobbyTimerInterval);
+
+        lobbyTimerInterval = setInterval(() => {
+            let indikiZaman = new Date().getTime();
+            let qalanVaxt = lastResetTimestamp - indikiZaman;
+
+            if (qalanVaxt <= 0) {
+                gundelikSifirlanmaniYoxla();
+                lobiniYenile();
+                return;
+            }
+
+            let saat = Math.floor((qalanVaxt % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let deqiqe = Math.floor((qalanVaxt % (1000 * 60 * 60)) / (1000 * 60));
+            let saniye = Math.floor((qalanVaxt % (1000 * 60)) / 1000);
+
+            document.getElementById("resetTimerText").textContent = 
+                `Yenilənmə: ${saat.toString().padStart(2, '0')}:${deqiqe.toString().padStart(2, '0')}:${saniye.toString().padStart(2, '0')}`;
+        }, 1000);
+    }
+
+    function istatistikleriGuncelle() {
+        document.getElementById("statTotalQ").textContent = totalQuestions;
+        document.getElementById("statCorrectQ").textContent = correctQuestions;
+        document.getElementById("statWrongQ").textContent = wrongQuestions;
+        document.getElementById("statCoins").textContent = playerCoins + " 🪙";
+    }
+
+    function unvaniHesabla() {
+        let titleElem = document.getElementById("playerTitle");
+        if (maxUnlockedLevel >= 8) titleElem.textContent = "🔥 Əfsanəvi Qəhrəman";
+        else if (maxUnlockedLevel >= 5) titleElem.textContent = "⚡ Master Döyüşçü";
+        else if (maxUnlockedLevel >= 3) titleElem.textContent = "🛡️ Təcrübəli Döyüşçü";
+        else titleElem.textContent = "🗡️ Acemi Döyüşçü";
+    }
+
+    function seviyyeGridiniQur() {
+        let grid = document.getElementById("levelSelectGrid");
+        let html = "";
+        for (let i = 1; i <= 10; i++) {
+            if (i <= maxUnlockedLevel) {
+                let activeClass = (i === cariSeviyye) ? "active-lvl" : "unlocked";
+                html += `<button class="lvl-btn ${activeClass}" onclick="seviyyeSec(${i})">${i}</button>`;
+            } else {
+                html += `<button class="lvl-btn locked" disabled>🔒</button>`;
+            }
+        }
+        grid.innerHTML = html;
+    }
+
+    function seviyyeSec(lvl) {
+        if (lvl <= maxUnlockedLevel) {
+            cariSeviyye = lvl;
+            seviyyeGridiniQur();
+        }
+    }
+
+    function gundelikTapSiriqlarUIUpdate() {
+        let container = document.getElementById("questItemsContainer");
+        let html = "";
+
+        dailyQuests.forEach(q => {
+            let progressText = `${q.current}/${q.target}`;
+            let actionHtml = "";
+
+            if (q.claimed) {
+                actionHtml = `<span class="claimed-badge">Götürüldü ✓</span>`;
+            } else if (q.current >= q.target) {
+                actionHtml = `<button class="claim-btn" onclick="mükafatiGotur(${q.id})">Götür</button>`;
+            } else {
+                actionHtml = `<span style="font-size: 10px; color: #64748b;">${progressText}</span>`;
+            }
+
+            let diffBadgeColor = q.type === 'easy' ? '#10b981' : (q.type === 'medium' ? '#fbbf24' : '#ef4444');
+
+            html += `
+                <div class="quest-card-item">
+                    <div class="quest-info-area">
+                        <span class="quest-title-text"><span style="color:${diffBadgeColor};">●</span> ${q.title}</span>
+                        <span class="quest-reward-text">Mükafat: +${q.reward} 🪙 Sikkə</span>
+                    </div>
+                    <div>${actionHtml}</div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    function mükafatiGotur(id) {
+        let quest = dailyQuests.find(q => q.id === id);
+        if (quest && quest.current >= quest.target && !quest.claimed) {
+            quest.claimed = true;
+            playerCoins += quest.reward;
+            if (typeof confetti === "function") {
+                confetti({ particleCount: 70, spread: 50, origin: { y: 0.6 } });
+            }
+            melumatlariYaddaSaxla();
+            gundelikTapSiriqlarUIUpdate();
+            istatistikleriGuncelle();
+        }
+    }
+
+    function tapSiriqlariIrelilet(tip, say = 1) {
+        dailyQuests.forEach(q => {
+            if (!q.claimed) {
+                if (tip === 'correct' && (q.type === 'medium' || q.type === 'hard')) {
+                    q.current = Math.min(q.target, q.current + say);
+                }
+                if (tip === 'boss' && q.type === 'easy') {
+                    q.current = Math.min(q.target, q.current + say);
+                }
+            }
+        });
+        melumatlariYaddaSaxla();
+    }
+
+    function lobidenOyunuBaslad() {
+        playerHp = 100;
+        if (lobbyTimerInterval) clearInterval(lobbyTimerInterval);
+        document.getElementById("lobbyScreen").classList.add("hidden");
+        seviyzeniBaslat();
+    }
+
+    function lobbiyeGetmekIsteyirsenmi() {
+        if (oyunBitdi) {
+            lobbiyeQayitDirect();
+            return;
+        }
+        clearInterval(timerInterval);
+        document.getElementById("confirmModal").classList.remove("hidden");
+    }
+
+    function modaliBagla() {
+        document.getElementById("confirmModal").classList.add("hidden");
+        if (!oyunBitdi) zamanlayiciDavamEt();
+    }
+
+    function lobbiyeQayitTesdiq() {
+        document.getElementById("confirmModal").classList.add("hidden");
+        lobbiyeQayitDirect();
+    }
+
+    function lobbiyeQayitDirect() {
+        clearInterval(timerInterval);
+        document.getElementById("gameOverScreen").classList.add("hidden");
+        document.getElementById("nextLevelScreen").classList.add("hidden");
+        document.getElementById("winScreen").classList.add("hidden");
+        document.getElementById("confirmModal").classList.add("hidden");
+        lobiniYenile();
+        document.getElementById("lobbyScreen").classList.remove("hidden");
+    }
+
+    function seviyzeniBaslat() {
+        oyunBitdi = false;
+        bossMaxHp = 100 + (cariSeviyye - 1) * 25;
+        bossHp = bossMaxHp;
+
+        let bazaKey = cariSeviyye > 10 ? 10 : cariSeviyye;
+        aktivSualHavasi = [...seviyyeSuallari[bazaKey]].sort(() => Math.random() - 0.5);
+        sehvEdilenlerNovbesi = [];
+
+        let bossInfo = bossAdlarVEmojiler[cariSeviyye] || { ad: "Super Boss " + cariSeviyye, emoji: "👾" };
+        document.getElementById("bossName").textContent = bossInfo.ad;
+        document.getElementById("bossAvatarEmoji").textContent = bossInfo.emoji;
+        document.getElementById("levelBadge").textContent = `Səviyyə ${cariSeviyye} / 10`;
+
+        document.getElementById("gameOverScreen").classList.add("hidden");
+        document.getElementById("nextLevelScreen").classList.add("hidden");
+        document.getElementById("winScreen").classList.add("hidden");
+        document.getElementById("quizArea").classList.remove("hidden");
+        document.getElementById("oyunMesaj").textContent = "";
+
+        guncelleUI();
+        novbetiSualGetir();
     }
 
     function guncelleUI() {
-        document.getElementById("coinCount").textContent = coin;
-        document.getElementById("hpCount").textContent = hp;
-        document.getElementById("dmgCount").textContent = dmg;
-        document.getElementById("canQiymeti").textContent = canQiymeti;
-        document.getElementById("hasarQiymeti").textContent = hasarQiymeti;
-        
-        document.getElementById("bossLvl").textContent = bossLvl;
-        document.getElementById("bossHp").textContent = bossHp;
-        document.getElementById("bossDmg").textContent = bossDmg;
+        document.getElementById("playerHpText").textContent = playerHp;
+        document.getElementById("playerHpFill").style.width = playerHp + "%";
 
-        // LocalStorage yadda saxlama
-        localStorage.setItem("rpg_coin", coin);
-        localStorage.setItem("rpg_hp", hp);
-        localStorage.setItem("rpg_maxHp", maxHp);
-        localStorage.setItem("rpg_dmg", dmg);
-        localStorage.setItem("rpg_canQiymeti", canQiymeti);
-        localStorage.setItem("rpg_hasarQiymeti", hasarQiymeti);
-        localStorage.setItem("rpg_bossLvl", bossLvl);
-        localStorage.setItem("rpg_bossMaxHp", bossMaxHp);
-        localStorage.setItem("rpg_bossHp", bossHp);
-        localStorage.setItem("rpg_bossDmg", bossDmg);
-        localStorage.setItem("rpg_dogruCavablananlar", JSON.stringify(dogruCavablananlar));
-        localStorage.setItem("rpg_quests", JSON.stringify(quests));
-        localStorage.setItem("rpg_questResetTime", questResetTime);
+        document.getElementById("bossHpText").textContent = bossHp;
+        document.getElementById("bossMaxHpText").textContent = bossMaxHp;
+        let bossFaiz = (bossHp / bossMaxHp) * 100;
+        document.getElementById("bossHpFill").style.width = bossFaiz + "%";
     }
 
-    function oyunBasla() {
-        const seviyye = document.getElementById("seviyyeSelect").value;
-        const liste = sualBazasi[seviyye];
-        
-        if (!dogruCavablananlar[seviyye]) {
-            dogruCavablananlar[seviyye] = [];
+    let cariSualObyekti = null;
+
+    function novbetiSualGetir() {
+        if (oyunBitdi) return;
+
+        if (sehvEdilenlerNovbesi.length > 0 && (Math.random() < 0.5 || aktivSualHavasi.length === 0)) {
+            cariSualObyekti = sehvEdilenlerNovbesi.shift();
+        } else {
+            let bazaKey = cariSeviyye > 10 ? 10 : cariSeviyye;
+            if (aktivSualHavasi.length === 0) {
+                aktivSualHavasi = [...seviyyeSuallari[bazaKey]].sort(() => Math.random() - 0.5);
+            }
+            cariSualObyekti = aktivSualHavasi.shift();
         }
 
-        // Yalnız hələ düzgün cavab verilməyən sualları süzgəcdən keçiririk
-        let movcudOlmadiyanlar = liste.filter(s => !dogruCavablananlar[seviyye].includes(s.id));
-        
-        // Əgər səviyyədəki bütün suallar düzgün cavablanıbsa, siyahını sıfırlayırıq ki, oyun davam etsin
-        if (movcudOlmadiyanlar.length === 0) {
-            dogruCavablananlar[seviyye] = [];
-            movcudOlmadiyanlar = liste;
-            showAlert(`Təbriklər! Bu səviyyədəki bütün sualları düzgün bildiniz. Siyahı yenidən başdan başladı! 🌟`);
-        }
+        document.getElementById("sualMetni").textContent = cariSualObyekti.s;
+        renderVariantlar(cariSualObyekti);
+    }
 
-        let tesadufiSual = movcudOlmadiyanlar[Math.floor(Math.random() * movcudOlmadiyanlar.length)];
-        
-        cariSual = { ...tesadufiSual, seviyye: seviyye };
-
-        document.getElementById("sualMetni").textContent = cariSual.s;
-        
-        let variantlarHTML = "";
-        let variantlarWithIndex = cariSual.v.map((v) => ({ text: v }));
-        variantlarWithIndex.sort(() => Math.random() - 0.5);
-
-        variantlarWithIndex.forEach(item => {
-            variantlarHTML += `<button class="variant-btn" onclick="cavabiYoxla('${item.text.replace(/'/g, "\\'")}', this)">${item.text}</button>`;
+    function renderVariantlar(cariSual) {
+        let variantlar = [...cariSual.v].sort(() => Math.random() - 0.5);
+        let html = "";
+        variantlar.forEach(v => {
+            let safeV = v.replace(/'/g, "\\'");
+            let safeD = cariSual.d.replace(/'/g, "\\'");
+            html += `<button class="variant-btn" onclick="cavabiYoxla('${safeV}', '${safeD}', this)">${v}</button>`;
         });
-
-        document.getElementById("variantlarArea").innerHTML = variantlarHTML;
-        document.getElementById("quizArea").style.display = "block";
+        document.getElementById("variantlarArea").innerHTML = html;
         document.getElementById("oyunMesaj").textContent = "";
-        document.getElementById("seviyyeSelect").disabled = true;
-        document.getElementById("startBtn").disabled = true;
-        guncelleUI();
+
+        zamanlayiciBaslat();
     }
 
-    function cavabiYoxla(secilenMetn, btnElement) {
+    function zamanlayiciBaslat() {
+        clearInterval(timerInterval);
+        timeLeft = 20;
+        let timerFill = document.getElementById("timerFill");
+        timerFill.style.width = "100%";
+        timerFill.style.background = "#fbbf24";
+
+        timerInterval = setInterval(() => {
+            timeLeft -= 0.1;
+            let faiz = (timeLeft / 20) * 100;
+            timerFill.style.width = faiz + "%";
+
+            if (timeLeft <= 5) timerFill.style.background = "#ef4444";
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                vaxtBitdiSehvSay();
+            }
+        }, 100);
+    }
+
+    function zamanlayiciDavamEt() {
+        let timerFill = document.getElementById("timerFill");
+        timerInterval = setInterval(() => {
+            timeLeft -= 0.1;
+            let faiz = (timeLeft / 20) * 100;
+            timerFill.style.width = faiz + "%";
+            if (timeLeft <= 5) timerFill.style.background = "#ef4444";
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                vaxtBitdiSehvSay();
+            }
+        }, 100);
+    }
+
+    function vaxtBitdiSehvSay() {
+        if (oyunBitdi) return;
+        totalQuestions++;
+        wrongQuestions++;
+        melumatlariYaddaSaxla();
+
         let btnlar = document.querySelectorAll(".variant-btn");
         btnlar.forEach(b => b.disabled = true);
 
-        const msgElem = document.getElementById("oyunMesaj");
-        let qazancCoin = 5;
-        if (cariSual.seviyye === "orta") qazancCoin = 8;
-        if (cariSual.seviyye === "cetin") qazancCoin = 12;
-        if (cariSual.seviyye === "coxCetin") qazancCoin = 16;
+        let pFighter = document.getElementById("playerFighter");
+        pFighter.classList.add("shake");
+        setTimeout(() => pFighter.classList.remove("shake"), 400);
 
-        if (secilenMetn === cariSual.d) {
-            btnElement.classList.add("variant-correct");
-            coin += qazancCoin;
-            msgElem.innerHTML = `✅ Düzgündür! +${qazancCoin} Coin qazandın.`;
-            msgElem.style.color = "#10b981";
+        let bossHasar = 10 + (cariSeviyye - 1) * 5;
+        playerHp -= bossHasar;
+        if (playerHp < 0) playerHp = 0;
+
+        let msgElem = document.getElementById("oyunMesaj");
+        msgElem.innerHTML = `⏳ Vaxt bitdi! Boss sənə <b>${bossHasar} zərər</b> vurdu.`;
+        msgElem.style.color = "#ef4444";
+
+        sehvEdilenlerNovbesi.push(cariSualObyekti);
+        guncelleUI();
+
+        if (playerHp <= 0) {
+            oyunBitdi = true;
+            document.getElementById("finalScoreText").textContent = `${playerName}, Səviyyə ${cariSeviyye}-də məğlub oldun!`;
+            setTimeout(() => document.getElementById("gameOverScreen").classList.remove("hidden"), 600);
+            return;
+        }
+
+        setTimeout(novbetiSualGetir, 1500);
+    }
+
+    function cavabiYoxla(secilen, dogruCavab, btnElem) {
+        if (oyunBitdi) return;
+        clearInterval(timerInterval);
+
+        totalQuestions++;
+        let btnlar = document.querySelectorAll(".variant-btn");
+        btnlar.forEach(b => b.disabled = true);
+        let msgElem = document.getElementById("oyunMesaj");
+
+        if (secilen === dogruCavab) {
+            correctQuestions++;
+            tapSiriqlariIrelilet('correct', 1);
+
+            btnElem.classList.add("variant-correct");
             
-            // Düzgün cavablandığı üçün bu sualı artıq düzgün cavablananlar siyahısına əlavə edirik (təkrar çıxmayacaq)
-            if (!dogruCavablananlar[cariSual.seviyye].includes(cariSual.id)) {
-                dogruCavablananlar[cariSual.seviyye].push(cariSual.id);
-            }
+            let bFighter = document.getElementById("bossFighter");
+            bFighter.classList.add("shake");
+            setTimeout(() => bFighter.classList.remove("shake"), 400);
 
-            if (typeof confetti === "function") {
-                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
-            }
+            bossHp -= 20;
+            if (bossHp < 0) bossHp = 0;
 
-            gelismisQuestIlerle(1, 1);
+            msgElem.innerHTML = "✨ Düzgündür! Bossa <b>20 zərər</b> vurdun!";
+            msgElem.style.color = "#10b981";
+
+            guncelleUI();
+
+            if (bossHp <= 0) {
+                oyunBitdi = true;
+                tapSiriqlariIrelilet('boss', 1);
+
+                if (typeof confetti === "function") {
+                    confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+                }
+
+                if (cariSeviyye >= maxUnlockedLevel && cariSeviyye < 10) {
+                    maxUnlockedLevel = cariSeviyye + 1;
+                }
+                melumatlariYaddaSaxla();
+
+                setTimeout(() => {
+                    if (cariSeviyye >= 10) {
+                        document.getElementById("winScreen").classList.remove("hidden");
+                    } else {
+                        document.getElementById("nextLevelText").textContent = `${playerName}, Səviyyə ${cariSeviyye} bossunu məğlub etdin!`;
+                        document.getElementById("nextLevelScreen").classList.remove("hidden");
+                    }
+                }, 600);
+                return;
+            }
 
         } else {
-            // Səhv cavab verildikdə dogruCavablananlar siyahısına ƏLAVƏ OLUNMUR, 
-            // beləliklə həmin sual qısa müddət sonra yenidən qarşınıza çıxacaq!
-            btnElement.classList.add("variant-wrong");
-            btnlar.forEach(b => {
-                if (b.textContent === cariSual.d) {
-                    b.classList.add("variant-correct");
-                }
-            });
-            hp -= 10;
-            msgElem.innerHTML = `❌ Səhvdir! Doğru cavab: <b>${cariSual.d}</b> (-10 Can)`;
-            msgElem.style.color = "#ef4444";
-            
-            const container = document.getElementById("mainContainer");
-            container.classList.add("shake-effect");
-            setTimeout(() => container.classList.remove("shake-effect"), 400);
+            wrongQuestions++;
+            btnElem.classList.add("variant-wrong");
+            btnlar.forEach(b => { if (b.textContent === dogruCavab) b.classList.add("variant-correct"); });
 
-            if (hp <= 0) {
-                hp = 0;
-                guncelleUI();
-                setTimeout(oyunBitdi, 800);
+            let pFighter = document.getElementById("playerFighter");
+            pFighter.classList.add("shake");
+            setTimeout(() => pFighter.classList.remove("shake"), 400);
+
+            let bossHasar = 10 + (cariSeviyye - 1) * 5;
+            playerHp -= bossHasar;
+            if (playerHp < 0) playerHp = 0;
+
+            msgElem.innerHTML = `❌ Səhvdir! Boss sənə <b>${bossHasar} zərər</b> vurdu.`;
+            msgElem.style.color = "#ef4444";
+
+            sehvEdilenlerNovbesi.push(cariSualObyekti);
+            guncelleUI();
+
+            if (playerHp <= 0) {
+                oyunBitdi = true;
+                document.getElementById("finalScoreText").textContent = `${playerName}, Səviyyə ${cariSeviyye}-də məğlub oldun!`;
+                setTimeout(() => document.getElementById("gameOverScreen").classList.remove("hidden"), 600);
                 return;
             }
         }
 
-        guncelleUI();
-
-        setTimeout(() => {
-            document.getElementById("seviyyeSelect").disabled = false;
-            document.getElementById("startBtn").disabled = false;
-            document.getElementById("quizArea").style.display = "none";
-            document.getElementById("oyunMesaj").textContent = "";
-        }, 1800);
+        melumatlariYaddaSaxla();
+        setTimeout(novbetiSualGetir, 1500);
     }
 
-    function canArtir() {
-        if (coin >= canQiymeti) {
-            coin -= canQiymeti;
-            maxHp += 20;
-            hp = maxHp;
-            canQiymeti = Math.floor(canQiymeti * 1.4);
-            showAlert(`❤️ Canınız artırıldı! Yeni Maksimum Can: ${maxHp}`);
-            gelismisQuestIlerle(2, 1);
-            guncelleUI();
-        } else {
-            showAlert("⚠️ Kafi qədər coin-iniz yoxdur! Daha çox sual cavablandırın.");
-        }
-    }
-
-    function hasarArtir() {
-        if (coin >= hasarQiymeti) {
-            coin -= hasarQiymeti;
-            dmg += 5;
-            hasarQiymeti = Math.floor(hasarQiymeti * 1.4);
-            showAlert(`⚔️ Hasarınız artırıldı! Yeni Hasar: ${dmg}`);
-            gelismisQuestIlerle(2, 1);
-            guncelleUI();
-        } else {
-            showAlert("⚠️ Kafi qədər coin-iniz yoxdur! Daha çox sual cavablandırın.");
-        }
-    }
-
-    function bossSavasi() {
-        const bossMsg = document.getElementById("bossMesaj");
-        
-        bossHp -= dmg;
-        if (bossHp < 0) bossHp = 0;
-
-        if (bossHp > 0) {
-            hp -= bossDmg;
-            bossMsg.innerHTML = `⚔️ Boss-a ${dmg} zərər vurdun! O da sənə ${bossDmg} vurdu.`;
-            bossMsg.style.color = "#f59e0b";
-        } else {
-            let mukafat = bossLvl * 30;
-            coin += mukafat;
-            if (typeof confetti === "function") {
-                confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
-            }
-            bossMsg.innerHTML = `🎉 Təbriklər! Boss Lvl ${bossLvl} məğlub edildi! +${mukafat} Coin qazandın!`;
-            bossMsg.style.color = "#10b981";
-
-            gelismisQuestIlerle(3, 1);
-
-            bossLvl++;
-            bossMaxHp = Math.floor(bossMaxHp * 1.5);
-            bossHp = bossMaxHp;
-            bossDmg += 5;
-        }
-
-        if (hp <= 0) {
-            hp = 0;
-            guncelleUI();
-            setTimeout(oyunBitdi, 600);
-            return;
-        }
-
-        guncelleUI();
-    }
-
-    function oyunBitdi() {
-        document.getElementById("game-over-screen").classList.remove("hidden");
-    }
-
-    function restartGame() {
-        coin = 0;
-        hp = 100;
-        maxHp = 100;
-        dmg = 10;
-        canQiymeti = 10;
-        hasarQiymeti = 10;
-        bossLvl = 1;
-        bossMaxHp = 30;
-        bossHp = 30;
-        bossDmg = 10;
-        dogruCavablananlar = { asan: [], orta: [], cetin: [], coxCetin: [] };
-        
-        localStorage.clear();
-        localStorage.setItem("rpg_oyuncuAdi", oyuncuAdi);
-        
-        document.getElementById("game-over-screen").classList.add("hidden");
-        document.getElementById("quizArea").style.display = "none";
-        document.getElementById("seviyyeSelect").disabled = false;
-        document.getElementById("startBtn").disabled = false;
-        document.getElementById("oyunMesaj").textContent = "";
-        document.getElementById("bossMesaj").textContent = "";
-        
-        guncelleUI();
-        showAlert("Oyun sıfırlandı. Yenidən başlaya bilərsən!");
-    }
-
-    function sifirlamaSorqusu() {
-        document.getElementById("custom-confirm").classList.remove("hidden");
-    }
-
-    function tesdiqSifirla() {
-        confirmBagla();
-        restartGame();
-    }
-
-    function confirmBagla() {
-        document.getElementById("custom-confirm").classList.add("hidden");
-    }
-
-    function showAlert(text) {
-        document.getElementById("alert-text").textContent = text;
-        document.getElementById("custom-alert").classList.remove("hidden");
-    }
-
-    function alertBagla() {
-        document.getElementById("custom-alert").classList.add("hidden");
-    }
-
-    function questleriGoster() {
-        zamanıYoxlaVəSıfırla();
-        renderQuestList();
-        document.getElementById("quest-modal").classList.remove("hidden");
-    }
-
-    function questleriBagla() {
-        document.getElementById("quest-modal").classList.add("hidden");
-    }
-
-    function renderQuestList() {
-        const listArea = document.getElementById("questListArea");
-        let html = "";
-        quests.forEach(q => {
-            let percent = Math.min(100, Math.floor((q.progress / q.target) * 100));
-            let isReady = q.progress >= q.target && !q.claimed;
-            let isDone = q.claimed;
-
-            html += `
-                <div class="quest-item">
-                    <div class="quest-info">
-                        <span>${q.text}</span>
-                        <span class="quest-reward">🎁 +${q.reward} Coin</span>
-                    </div>
-                    <div class="quest-progress-bar">
-                        <div class="quest-progress-fill" style="width: ${percent}%;"></div>
-                    </div>
-                    <div class="quest-footer">
-                        <span class="quest-status">${q.progress}/${q.target} Tamamlandı</span>
-                        <button class="claim-btn" ${isDone ? 'disabled' : ''} onclick="mukafatiAl(${q.id})">
-                            ${isDone ? 'Aldın ✔️' : (isReady ? 'Mükafatı Al ✨' : 'Davam edir...')}
-                        </button>
-                    </div>
-                </div>
-            `;
-        });
-        listArea.innerHTML = html;
-    }
-
-    function gelismisQuestIlerle(qId, miktar) {
-        zamanıYoxlaVəSıfırla();
-        let q = quests.find(item => item.id === qId);
-        if (q && !q.claimed) {
-            q.progress += miktar;
-            if (q.progress > q.target) q.progress = q.target;
-            guncelleUI();
-            yoxlaQuestBildirisleri();
-        }
-    }
-
-    function mukafatiAl(qId) {
-        let q = quests.find(item => item.id === qId);
-        if (q && q.progress >= q.target && !q.claimed) {
-            q.claimed = true;
-            coin += q.reward;
-            if (typeof confetti === "function") {
-                confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
-            }
-            showAlert(`🎁 Təbriklər! Tapşırıq tamamlandı və +${q.reward} Coin hesabınıza əlavə olundu.`);
-            guncelleUI();
-            renderQuestList();
-            yoxlaQuestBildirisleri();
-        }
-    }
-
-    function yoxlaQuestBildirisleri() {
-        let hazirVar = quests.some(q => q.progress >= q.target && !q.claimed);
-        const badge = document.getElementById("questBadge");
-        if (hazirVar) {
-            badge.classList.remove("hidden-badge");
-        } else {
-            badge.classList.add("hidden-badge");
-        }
-    }
-
-    function taymeriYenile() {
-        let qalaqSec = Math.floor((questResetTime - Date.now()) / 1000);
-        if (qalaqSec <= 0) {
-            yenidenQuestleriSifirla();
-            qalaqSec = 24 * 60 * 60;
-        }
-        let saat = Math.floor(qalaqSec / 3600);
-        let deqiqe = Math.floor((qalaqSec % 3600) / 60);
-        let saniye = qalaqSec % 60;
-        
-        const timerText = document.getElementById("questTimerText");
-        if (timerText) {
-            timerText.textContent = `⏳ Yenilənməyə: ${saat}s ${deqiqe}d ${saniye}s`;
-        }
-    }
-
-    function zamanıYoxlaVəSıfırla() {
-        if (Date.now() >= questResetTime) {
-            yenidenQuestleriSifirla();
-        }
-    }
-
-    function yenidenQuestleriSifirla() {
-        quests = [
-            { id: 1, text: "3 dəfə düzgün cavab ver", target: 3, progress: 0, reward: 25, claimed: false },
-            { id: 2, text: "Mağazadan hər hansı gücləndirmə al", target: 1, progress: 0, reward: 20, claimed: false },
-            { id: 3, text: "1 Boss məğlub et", target: 1, progress: 0, reward: 40, claimed: false }
-        ];
-        questResetTime = Date.now() + 24 * 60 * 60 * 1000;
-        guncelleUI();
+    function novbetiSeviyseyeGec() {
+        cariSeviyye++;
+        document.getElementById("nextLevelScreen").classList.add("hidden");
+        seviyzeniBaslat();
     }
 </script>
 
